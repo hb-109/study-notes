@@ -86,6 +86,18 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
 .x-b { font-weight: 700; }
 .x-i { font-style: italic; }
 .x-dim { color: #80868b; }
+.x-miss { color: #9aa0a6; }
+.x-extra { color: #8c1d18; }
+.x-go { color: #0b57d0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.x-go:hover { color: #0842a0; }
+.s-grid td.x-go { text-decoration: none; }
+.x-opt { cursor: pointer; color: #80868b; border-radius: 3px; padding: 0 1px; -webkit-user-select: none; user-select: none; }
+.x-opt:hover { color: #1f1f1f; text-decoration: underline; text-underline-offset: 2px; }
+.x-opt.x-on { color: #0b57d0; font-weight: 700; }
+.x-opt.x-on:hover { text-decoration: none; }
+.d-content .d-p.x-cfg { text-indent: 0; font: 12.5px/1.6 Roboto, Arial, Arimo, sans-serif; margin: 4px 0 8px; }
+.sc-a.x-cfg { margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+.s-grid td.x-cfg { font-size: 12px; }
 .x-mono { font-family: "Courier Prime", "Courier New", Courier, monospace; letter-spacing: .04em; }
 .x-mk-ok { background: #d9ead3; font-weight: 700; }
 .x-mk-near { background: #fff2cc; font-weight: 700; }
@@ -361,6 +373,11 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
 .bw-dd { position: fixed; z-index: 300; min-width: 250px; max-width: 340px; padding: 6px 0; background: #fff; border-radius: 4px; box-shadow: 0 2px 6px 2px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.3); font: 14px var(--f-g); color: #1f1f1f; }
 .dd-i { display: flex; align-items: center; width: 100%; height: 32px; padding: 0 16px 0 6px; border: 0; background: none; text-align: left; cursor: pointer; font: inherit; color: inherit; }
 .dd-i.f { background: #f1f3f4; }
+/* working game controls read a touch heavier than the decoy items
+   (a faint stroke works the same whether or not the web fonts load) */
+.dd-i.real .dd-l, .d-menu[data-wt="menu"], .c-menu[data-wt="menu"] { -webkit-text-stroke: .35px currentColor; }
+.dd-i.real .dd-l { color: #000; }
+.dd-script .dd-i.real .dd-l { color: #fff; }
 .dd-ck { width: 30px; display: grid; place-items: center; color: #444746; flex: none; }
 .dd-l { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dd-sc { color: #5f6368; font-size: 13px; padding-left: 20px; white-space: nowrap; }
@@ -386,6 +403,8 @@ kbd { font-family: var(--f-mono); font-size: 12px; border: 1px solid var(--line)
 .pf-key.rec { border-color: #0b57d0; color: #0b57d0; background: #e8f0fe; }
 .pf-hint { color: #b3261e; font-size: 13px; padding-top: 6px; }
 .pf-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #0b57d0; }
+#pf-num { width: 84px; font: 500 16px var(--f-g); padding: 5px 8px; border: 1px solid #747775; border-radius: 6px; }
+.dlg-script #pf-num { background: #1f1f1f; color: #ececec; }
 #pf-init { width: 40px; text-align: center; font: 500 16px var(--f-g); padding: 5px; border: 1px solid #747775; border-radius: 6px; }
 .pf-confirm { display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding: 12px 0 0; color: #b3261e; }
 .pf-confirm span { flex: 1; }
@@ -645,7 +664,8 @@ const DECOY = {
    Rare answers: answer key, part 1 (the human body).
    Format: Display name/alias/alias | next answer ...
    Answers are listed roughly from most to least common; rarity
-   tiers come from that order unless an entry ends in :1 to :5.
+   tiers (1-4) come from that order unless an entry ends in :1 to :4.
+   Exactly one entry per category ends in :5, the One in a Krillion.
    The last argument lists filler words ignored when matching.
    ============================================================ */
 const RARE = [];
@@ -673,7 +693,7 @@ function R(s, q, a, ign) { RARE.push({ s, q, a, ign: ign || '' }); }
   Pulmonary arteries/pulmonary artery|Pulmonary veins/pulmonary vein|Bronchi/bronchus/bronchial tube/bronchial tubes/main bronchus|Atria/atrium/heart atrium/auricle|
   Ventricles/ventricle/heart ventricle|Lateral ventricles/lateral ventricle|Hippocampi/hippocampus|Amygdalae/amygdala|Thalami/thalamus|
   Frontal lobes/frontal lobe|Temporal lobes/temporal lobe|Parietal lobes/parietal lobe|Occipital lobes/occipital lobe|Cerebellar hemispheres/cerebellar hemisphere|
-  Olfactory bulbs/olfactory bulb|Cochleas/cochlea/cochleae|Inner ears/inner ear|Middle ears/middle ear|Outer ears/outer ear/auricle/pinna|
+  Olfactory bulbs/olfactory bulb:5|Cochleas/cochlea/cochleae|Inner ears/inner ear|Middle ears/middle ear|Outer ears/outer ear/auricle/pinna|
   Eustachian tubes/eustachian tube/auditory tube|Semicircular canals/semicircular canal|Vocal cords/vocal cord/vocal folds/vocal fold|
   Parotid glands/parotid gland|Submandibular glands/submandibular gland|Sublingual glands/sublingual gland|Salivary glands/salivary gland|Mammary glands/mammary gland|
   Seminal vesicles/seminal vesicle|Epididymides/epididymis|Vas deferens/vasa deferentia|Frontal sinuses/frontal sinus|Maxillary sinuses/maxillary sinus|
@@ -710,17 +730,17 @@ function R(s, q, a, ign) { RARE.push({ s, q, a, ign: ign || '' }); }
   const plural = n => n.replace(/(toe|finger|nail|knuckle|tip)$/, '$1s');
   const items = [];
   fingers.forEach(([n, al], i) => {
-    items.push(`${plural(n)}/${al}:${i ? 3 : 2}`);
-    items.push(`${n}nails/` + al.split('/').map(a => a.replace(/finger$/, '') + ' nail/' + a.replace(/finger$/, '') + ' fingernail').join('/') + ':5');
+    items.push(`${plural(n)}/${al}:2`);
+    items.push(`${n}nails/` + al.split('/').map(a => a.replace(/finger$/, '') + ' nail/' + a.replace(/finger$/, '') + ' fingernail').join('/') + ':4');
     const short = al.split('/').filter(a => / finger$/.test(a)).map(a => a.replace(/ finger$/, ''));
-    items.push(`${n} knuckles/` + al.split('/').concat(short).map(a => a + ' knuckle').join('/') + ':5');
-    items.push(`${n}tips/` + al.split('/').concat(short).map(a => a + ' tip').join('/') + ':5');
+    items.push(`${n} knuckles/` + al.split('/').concat(short).map(a => a + ' knuckle').join('/') + ':4');
+    items.push(`${n}tips/` + al.split('/').concat(short).map(a => a + ' tip').join('/') + ':4');
   });
-  items.push('Thumbnails/thumbnail/thumb nail/thumb fingernail:4', 'Thumb knuckles/thumb knuckle:5', 'Thumb tips/thumb tip/tip of the thumb:5');
+  items.push('Thumbnails/thumbnail/thumb nail/thumb fingernail:3', 'Thumb knuckles/thumb knuckle:4', 'Thumb tips/thumb tip/tip of the thumb:4');
   toes.forEach(([n, al], i) => {
-    items.push(`${plural(n)}/${al}:${i === 0 ? 2 : i === 4 ? 3 : 4}`);
-    items.push(`${n}nails/` + al.split('/').map(a => a.replace(/toe$/, 'toenail') + '/' + a + ' nail').join('/') + ':5');
-    items.push(`${n} knuckles/` + al.split('/').map(a => a + ' knuckle').join('/') + ':5');
+    items.push(`${plural(n)}/${al}:${i === 0 || i === 4 ? 2 : 3}`);
+    items.push(`${n}nails/` + al.split('/').map(a => a.replace(/toe$/, 'toenail') + '/' + a + ' nail').join('/') + ':4');
+    items.push(`${n} knuckles/` + al.split('/').map(a => a + ' knuckle').join('/') + ':4');
   });
   const list = base + '|' + items.join('|');
   R('Body parts humans have two of', 'Name a part of the body that humans have two of.', list, 'left right both two pair pairs set sets human humans person persons our of each');
@@ -732,17 +752,17 @@ Fibula|Radius|Ulna|Pelvis/pelvic bone/pelvic girdle|Patella/kneecap/knee cap|Ste
 Scapula/shoulder blade|Mandible/jawbone/jaw bone/jaw/lower jaw|Vertebra/vertebrae/vertebras|Coccyx/tailbone/tail bone|Sacrum|Hip bone/coxal bone/innominate bone|
 Phalanges/phalanx/finger bone/finger bones/toe bone/toe bones|Metacarpals/metacarpal/hand bones|Metatarsals/metatarsal/foot bones|Carpals/carpal/wrist bones/wrist bone|
 Tarsals/tarsal|Maxilla/upper jaw|Stapes/stirrup|Incus/anvil|Malleus/hammer|Hyoid/hyoid bone|Calcaneus/heel bone|Talus/ankle bone/astragalus|
-Rib cage/ribcage/thoracic cage|Cheekbone/zygomatic/zygomatic bone/malar bone|Funny bone:3|Navicular|Cuboid|Cuneiform/cuneiforms|Scaphoid|Lunate|
+Rib cage/ribcage/thoracic cage|Cheekbone/zygomatic/zygomatic bone/malar bone|Funny bone:2|Navicular|Cuboid|Cuneiform/cuneiforms|Scaphoid|Lunate|
 Triquetrum|Pisiform|Trapezium|Trapezoid|Capitate|Hamate|Ilium|Ischium/sit bone/sitz bone/sitting bone|Pubis/pubic bone|Nasal bone/nose bone|
 Lacrimal bone|Palatine bone|Vomer|Inferior nasal concha/turbinate|Frontal bone/forehead bone|Parietal bone|Temporal bone|Occipital bone/occiput|
 Sphenoid/sphenoid bone|Ethmoid/ethmoid bone|Atlas/c1|Axis/c2|Cervical vertebrae/neck bones/neck bone/cervical vertebra|Thoracic vertebrae/thoracic vertebra|
 Lumbar vertebrae/lumbar vertebra/lower back bones|Floating ribs/floating rib|True ribs/true rib|False ribs/false rib|Xiphoid process/xiphoid|Manubrium|
 Sesamoid bones/sesamoid|Ossicles/ear bones/ear bone/auditory ossicles|Proximal phalanges|Middle phalanges|Distal phalanges|Medial cuneiform|Intermediate cuneiform|
-Lateral cuneiform|Fabella|Coracoid process|Acromion|Olecranon/elbow bone/elbow tip|Mastoid process|Styloid process|Greater trochanter|Lesser trochanter|
+Lateral cuneiform|Fabella:5|Coracoid process|Acromion|Olecranon/elbow bone/elbow tip|Mastoid process|Styloid process|Greater trochanter|Lesser trochanter|
 Iliac crest|Ischial tuberosity|Femoral head|Medial malleolus/inner ankle bone|Lateral malleolus/outer ankle bone|Dens/odontoid process|Acetabulum/hip socket|
 Pectoral girdle/shoulder girdle|Calvaria/skullcap/skull cap|Facial bones|Cranial bones|Wormian bones/sutural bones|Knuckle bones/knuckles|Hallux bones|
 Tibial plateau|Humeral head|Glenoid|Spinous process|Transverse process|Os trigonum|Accessory navicular|Coccygeal vertebrae|Sacral vertebrae|Mental protuberance/chin bone|
-Alveolar bone/tooth socket|Ankle:4|Shoulder bone:4|Breastplate/breast plate:5`);
+Alveolar bone/tooth socket|Ankle:3|Shoulder bone:3|Breastplate/breast plate:4`);
 
 R('Organs and inner body parts', 'Name an organ or inner part of the human body.', `
 Heart|Brain|Lungs/lung|Liver|Stomach/belly/tummy|Kidneys/kidney|Intestines/intestine/gut/guts/bowel/bowels|Skin|Small intestine/small bowel|
@@ -754,15 +774,15 @@ Blood vessels/blood vessel|Nerves/nerve|Spinal cord|Cerebellum|Cerebrum|Brainste
 Bronchi/bronchus/bronchial tubes|Bronchioles/bronchiole|Alveoli/alveolus/air sacs|Pleura|Pericardium|Peritoneum|Mesentery|Omentum|Salivary glands/salivary gland|
 Parotid gland|Sublingual gland|Submandibular gland|Parathyroid glands/parathyroid|Fallopian tubes/fallopian tube|Cervix|Vagina|Placenta|Epiglottis|Uvula|
 Soft palate|Hard palate/palate/roof of the mouth|Gums/gum|Teeth/tooth|Nose|Sinuses/sinus|Ears/ear|Cochlea|Mammary glands/mammary gland|Sweat glands/sweat gland|
-Sebaceous glands/oil glands|Hair follicles/hair follicle|Muscles/muscle|Tendons/tendon|Ligaments/ligament|Cartilage|Fascia|Lymphatic vessels/lymph vessels|Interstitium|
+Sebaceous glands/oil glands|Hair follicles/hair follicle|Muscles/muscle|Tendons/tendon|Ligaments/ligament|Cartilage|Fascia|Lymphatic vessels/lymph vessels|Interstitium:5|
 Nails/nail/fingernails|Hair|Blood|Fat/adipose tissue/body fat|Bile duct/bile ducts|Islets of Langerhans/islets|Corpus callosum|Basal ganglia|Retina|Vocal cords/vocal folds|
 Heart valves/heart valve|Aortic valve|Mitral valve|Tricuspid valve|Pulmonary valve|Atria/atrium|Ventricles/ventricle|Septum|Coronary arteries/coronary artery|
-Carotid artery|Jugular vein|Pulmonary artery|Portal vein|Lymph|Bones/bone|Skeleton|Joints/joint|Ribs/rib|Spine:4|Sphincter|
+Carotid artery|Jugular vein|Pulmonary artery|Portal vein|Lymph|Bones/bone|Skeleton|Joints/joint|Ribs/rib|Spine:3|Sphincter|
 Seminal vesicles|Epididymis|Vas deferens|Ovarian follicles|Endometrium|Myometrium|Thyroid cartilage/adams apple/adam s apple|Cricoid cartilage|Hyoid|
 Gastric glands|Pyloric sphincter/pylorus|Villi/villus|Microvilli|Sigmoid colon|Transverse colon|Ascending colon|Descending colon|
 Hepatic duct|Common bile duct|Cystic duct|Kidney tubules/nephrons/nephron|Glomerulus/glomeruli|Renal pelvis|Adrenal medulla|Adrenal cortex|Brain ventricles|
 Meninges/dura mater/arachnoid/pia mater|Cerebrospinal fluid/csf|Optic nerve|Vagus nerve|Sciatic nerve|Plexus/solar plexus|Neurons/neuron/brain cells|Dendrites|
-Synapses|Tear ducts/tear glands|Lens|Cornea|Iris|Pupil|Eardrum|Eustachian tube|Semicircular canals|Taste buds|Olfactory bulb|Belly button/navel:5`);
+Synapses|Tear ducts/tear glands|Lens|Cornea|Iris|Pupil|Eardrum|Eustachian tube|Semicircular canals|Taste buds|Olfactory bulb|Belly button/navel:4`);
 
 R('Muscles', 'Name a muscle in the human body.', `
 Biceps/bicep/biceps brachii|Triceps/tricep/triceps brachii|Abs/abdominals/ab/six pack/rectus abdominis/stomach muscles|Quadriceps/quads/quad/quadricep|
@@ -777,10 +797,10 @@ External obliques|Sternocleidomastoid/scm/neck muscle|Scalenes/scalene|Levator s
 Frontalis|Zygomaticus|Platysma|Risorius|Mentalis|Levator palpebrae|Pterygoid|Digastric|Mylohyoid|Intercostals/intercostal|Coracobrachialis|Anconeus|Pronator teres|
 Supinator|Flexor carpi radialis|Extensor carpi radialis|Flexor digitorum|Extensor digitorum|Palmaris longus|Thenar muscles/thenar|Hypothenar|Lumbricals|Interossei|
 Abductor pollicis|Opponens pollicis|Flexor hallucis|Extensor hallucis|Plantaris|Popliteus|Pectineus|Adductor magnus|Adductor longus|Adductor brevis|Obturator|
-Gemellus|Multifidus|Levator ani|Pelvic floor|Sphincter|Detrusor|Stapedius|Tensor tympani|Ciliary muscle|Arrector pili|Cremaster|Smooth muscle|Skeletal muscle|
-Core:4|Neck muscles:4|Back muscles:4|Shoulder muscles:4|Chest muscles:4|Leg muscles:4|Arm muscles:4|Eye muscles:5|Uterus/uterine muscle:5|Iris muscle:5|
-Diaphragm muscle:5|Rectus capitis:5|Longus colli:5|Serratus posterior:5|Iliocostalis:5|Longissimus:5|Spinalis:5|Corrugator supercilii:5|Procerus:5|Nasalis:5|
-Depressor anguli oris:5|Levator labii:5|Orbicularis:5|Extensor pollicis:5|Flexor pollicis:5|Abductor digiti minimi:5|Quadratus plantae:5|Flexor digitorum brevis:5`);
+Gemellus|Multifidus|Levator ani|Pelvic floor|Sphincter|Detrusor|Stapedius:5|Tensor tympani|Ciliary muscle|Arrector pili|Cremaster|Smooth muscle|Skeletal muscle|
+Core:3|Neck muscles:3|Back muscles:3|Shoulder muscles:3|Chest muscles:3|Leg muscles:3|Arm muscles:3|Eye muscles:4|Uterus/uterine muscle:4|Iris muscle:4|
+Diaphragm muscle:4|Rectus capitis:4|Longus colli:4|Serratus posterior:4|Iliocostalis:4|Longissimus:4|Spinalis:4|Corrugator supercilii:4|Procerus:4|Nasalis:4|
+Depressor anguli oris:4|Levator labii:4|Orbicularis:4|Extensor pollicis:4|Flexor pollicis:4|Abductor digiti minimi:4|Quadratus plantae:4|Flexor digitorum brevis:4`);
 
 /* Rare answers: answer key, part 2 (places). */
 const COUNTRIES = `United States/usa/us/u s a/america/united states of america/the states|China/prc/peoples republic of china|Canada|Mexico|Japan|France|Germany|Brazil|
@@ -791,7 +811,7 @@ New Zealand|Denmark|Finland|Belgium|Austria|Iceland|Ethiopia|Morocco|Haiti|Engla
 Czech Republic/czechia|Slovakia|Hungary|Romania|Bulgaria|Serbia|Croatia|Bosnia and Herzegovina/bosnia/bosnia herzegovina|Slovenia|Montenegro|North Macedonia/macedonia|
 Albania|Kosovo|Moldova|Belarus|Lithuania|Latvia|Estonia|Luxembourg|Monaco|Liechtenstein|Andorra|San Marino|Vatican City/vatican/holy see|Malta|Cyprus|Georgia|Armenia|
 Azerbaijan|Kazakhstan|Uzbekistan|Turkmenistan|Kyrgyzstan|Tajikistan|Syria|Lebanon|Jordan|Kuwait|Qatar|Bahrain|United Arab Emirates/uae/emirates|Oman|Yemen|Palestine|
-Myanmar/burma|Laos|Cambodia|Brunei|East Timor/timor leste|Bhutan|Maldives|Papua New Guinea/png|Fiji|Samoa|Tonga|Vanuatu|Solomon Islands|Kiribati|Tuvalu|Nauru|Palau|
+Myanmar/burma|Laos|Cambodia|Brunei|East Timor/timor leste|Bhutan|Maldives|Papua New Guinea/png|Fiji|Samoa|Tonga|Vanuatu|Solomon Islands|Kiribati|Tuvalu|Nauru:5|Palau|
 Marshall Islands|Micronesia/federated states of micronesia|Algeria|Tunisia|Libya|Sudan|South Sudan|Ghana|Senegal|Mali|Niger|Chad|Cameroon|Ivory Coast/cote d ivoire/cote divoire|
 Liberia|Sierra Leone|Guinea|Guinea-Bissau/guinea bissau|Gambia/the gambia|Burkina Faso|Benin|Togo|Mauritania|Cape Verde/cabo verde|Central African Republic/car|
 Democratic Republic of the Congo/drc/dr congo/congo kinshasa/zaire|Republic of the Congo/congo/congo brazzaville|Gabon|Equatorial Guinea|Sao Tome and Principe/sao tome|
@@ -804,13 +824,13 @@ R('Countries', 'Name a country.', COUNTRIES, 'country nation republic kingdom of
 R('African countries', 'Name a country in Africa.', `Egypt|South Africa|Nigeria|Kenya|Morocco|Ethiopia|Ghana|Madagascar|Algeria|Libya|Tunisia|Sudan|Somalia|Uganda|Tanzania|Zimbabwe|Rwanda|Senegal|
 Cameroon|Angola|Mali|Democratic Republic of the Congo/drc/dr congo/congo kinshasa/zaire|Republic of the Congo/congo/congo brazzaville|Ivory Coast/cote d ivoire/cote divoire|
 Zambia|Namibia|Botswana|Mozambique|Niger|Chad|South Sudan|Liberia|Sierra Leone|Malawi|Burundi|Eritrea|Djibouti|Gabon|Togo|Benin|Burkina Faso|Guinea|Guinea-Bissau/guinea bissau|
-Gambia/the gambia|Mauritania|Mauritius|Seychelles|Cape Verde/cabo verde|Central African Republic/car|Equatorial Guinea|Sao Tome and Principe/sao tome|Comoros|Lesotho|Eswatini/swaziland`,
+Gambia/the gambia|Mauritania|Mauritius|Seychelles|Cape Verde/cabo verde|Central African Republic/car|Equatorial Guinea|Sao Tome and Principe/sao tome:5|Comoros|Lesotho|Eswatini/swaziland`,
   'country nation republic of');
 
 R('European countries', 'Name a country in Europe.', `France|Germany|Italy|Spain|United Kingdom/uk/britain/great britain|England|Ireland|Portugal|Greece|Netherlands/holland|Belgium|Switzerland|Austria|
 Sweden|Norway|Denmark|Finland|Poland|Russia|Ukraine|Iceland|Scotland|Czech Republic/czechia|Hungary|Romania|Croatia|Wales|Turkey/turkiye|Bulgaria|Serbia|Slovakia|Slovenia|
 Luxembourg|Monaco|Vatican City/vatican/holy see|Malta|Cyprus|Belarus|Lithuania|Latvia|Estonia|Albania|Bosnia and Herzegovina/bosnia|Montenegro|North Macedonia/macedonia|
-Kosovo|Moldova|Liechtenstein|Andorra|San Marino|Northern Ireland|Georgia|Armenia|Azerbaijan|Kazakhstan`, 'country nation republic of');
+Kosovo|Moldova|Liechtenstein|Andorra|San Marino:5|Northern Ireland|Georgia|Armenia|Azerbaijan|Kazakhstan`, 'country nation republic of');
 
 R('Capital cities', 'Name a national capital city.', `Washington DC/washington/washington d c|London|Paris|Tokyo|Beijing/peking|Moscow|Rome|Berlin|Madrid|Ottawa|Mexico City|Cairo|New Delhi/delhi|Canberra|
 Brasilia|Buenos Aires|Seoul|Athens|Dublin|Lisbon|Amsterdam|Brussels|Vienna|Bern/berne|Stockholm|Oslo|Copenhagen|Helsinki|Reykjavik|Warsaw|Prague|Budapest|Bucharest|
@@ -818,21 +838,21 @@ Sofia|Belgrade|Zagreb|Sarajevo|Ljubljana|Podgorica|Skopje|Tirana|Pristina|Chisin
 Andorra la Vella|San Marino|Vatican City|Valletta|Nicosia|Ankara|Tbilisi|Yerevan|Baku|Astana/nur sultan|Tashkent|Ashgabat|Bishkek|Dushanbe|Kabul|Islamabad|Tehran|
 Baghdad|Damascus|Beirut|Amman|Jerusalem|Riyadh|Kuwait City|Doha|Manama|Abu Dhabi|Muscat|Sanaa|Dhaka|Kathmandu|Thimphu|Colombo|Sri Jayawardenepura Kotte/kotte|Male|
 Naypyidaw/nay pyi taw|Bangkok|Vientiane|Phnom Penh|Hanoi|Kuala Lumpur|Singapore|Jakarta|Manila|Dili|Bandar Seri Begawan|Taipei|Ulaanbaatar/ulan bator|Pyongyang|
-Wellington|Port Moresby|Suva|Apia|Nukualofa|Port Vila|Honiara|Tarawa|Funafuti|Yaren|Ngerulmud|Majuro|Palikir|Algiers|Tunis|Tripoli|Rabat|Khartoum|Juba|Addis Ababa|
+Wellington|Port Moresby|Suva|Apia|Nukualofa|Port Vila|Honiara|Tarawa|Funafuti|Yaren|Ngerulmud:5|Majuro|Palikir|Algiers|Tunis|Tripoli|Rabat|Khartoum|Juba|Addis Ababa|
 Asmara|Djibouti|Mogadishu|Nairobi|Kampala|Kigali|Gitega|Dodoma|Lusaka|Harare|Lilongwe|Maputo|Gaborone|Windhoek|Pretoria|Cape Town|Bloemfontein|Maseru|Mbabane|Lobamba|
 Antananarivo|Port Louis|Victoria|Moroni|Luanda|Kinshasa|Brazzaville|Libreville|Malabo|Yaounde|Bangui|NDjamena/n djamena|Niamey|Abuja|Porto-Novo/porto novo|Lome|Accra|
-Ouagadougou|Bamako|Dakar|Banjul|Bissau|Conakry|Freetown|Monrovia|Yamoussoukro|Abidjan:5|Nouakchott|Praia|Sao Tome|Guatemala City|Tegucigalpa|San Salvador|Managua|
+Ouagadougou|Bamako|Dakar|Banjul|Bissau|Conakry|Freetown|Monrovia|Yamoussoukro|Abidjan:4|Nouakchott|Praia|Sao Tome|Guatemala City|Tegucigalpa|San Salvador|Managua|
 San Jose|Panama City|Belmopan|Havana|Kingston|Port-au-Prince/port au prince|Santo Domingo|Nassau|Bridgetown|Port of Spain|St Georges/saint georges|Castries|Kingstown|
 Basseterre|St Johns/saint johns|Roseau|Bogota|Caracas|Quito|Lima|La Paz|Sucre|Asuncion|Montevideo|Santiago|Georgetown|Paramaribo|Edinburgh|Cardiff|Belfast`, 'city capital of');
 
 R('U.S. states', 'Name a U.S. state.', `California/ca/cali|Texas/tx|Florida/fl|New York/ny|Hawaii/hi|Alaska/ak|Washington/wa|Arizona/az|Nevada/nv|Colorado/co|Ohio/oh|Michigan/mi|Illinois/il|
 Georgia/ga|Oregon/or|Utah/ut|New Jersey/nj|Pennsylvania/pa|Massachusetts/ma|Virginia/va|North Carolina/nc|South Carolina/sc|Tennessee/tn|Louisiana/la|Kentucky/ky|
 Alabama/al|Mississippi/ms|Minnesota/mn|Wisconsin/wi|Iowa/ia|Missouri/mo|Kansas/ks|Nebraska/ne|Oklahoma/ok|Arkansas/ar|New Mexico/nm|Idaho/id|Montana/mt|Wyoming/wy|
-North Dakota/nd|South Dakota/sd|Indiana/in|Maryland/md|Delaware/de|Connecticut/ct|Rhode Island/ri|Vermont/vt|New Hampshire/nh|Maine/me|West Virginia/wv`, 'state of the');
+North Dakota/nd:5|South Dakota/sd|Indiana/in|Maryland/md|Delaware/de|Connecticut/ct|Rhode Island/ri|Vermont/vt|New Hampshire/nh|Maine/me|West Virginia/wv`, 'state of the');
 
 R('U.S. state capitals', 'Name the capital city of a U.S. state.', `Sacramento|Austin|Boston|Atlanta|Denver|Phoenix|Honolulu|Nashville|Albany|Tallahassee|Salt Lake City|Indianapolis|Columbus|Richmond|Raleigh|
 Juneau|Olympia|Springfield|Annapolis|Baton Rouge|Little Rock|Oklahoma City|Montgomery|Lansing|Madison|Saint Paul/st paul|Des Moines|Topeka|Lincoln|Jefferson City|
-Jackson|Frankfort|Columbia|Charleston|Hartford|Providence|Trenton|Dover|Harrisburg|Montpelier|Concord|Augusta|Boise|Helena|Cheyenne|Bismarck|Pierre|Santa Fe|Carson City|Salem`,
+Jackson|Frankfort|Columbia|Charleston|Hartford|Providence|Trenton|Dover|Harrisburg|Montpelier|Concord|Augusta|Boise|Helena|Cheyenne|Bismarck|Pierre:5|Santa Fe|Carson City|Salem`,
   'city capital of');
 
 R('Rivers', 'Name a river anywhere in the world.', `Nile|Amazon|Mississippi|Colorado|Thames|Missouri|Rio Grande|Hudson|Ganges/ganga|Yangtze/chang jiang|Danube|Rhine|Seine|Ohio|Columbia|Jordan|
@@ -850,8 +870,8 @@ Cuanza|Madeira|Negro/rio negro|Purus|Japura|Jurua|Xingu|Tapajos|Tocantins|Aragua
 Maranon|Napo|Putumayo|Beni|Mamore|Rio de la Plata/river plate|Biobio|Fraser|Nelson|Churchill|Saskatchewan|Athabasca|Assiniboine|Ottawa|Saguenay|Skeena|Usumacinta|
 Grijalva|Balsas|Lerma|Yaqui|Fuerte|Panuco|Avon|Ouse|Wye|Dee|Exe|Tweed|Forth|Bann|Lagan|Boyne|Lee|Barrow|Scheldt|Meuse/maas|Rur|Saar|Isar|Lech|Drava|Sava|
 Tisza|Morava|Prut|Siret|Mures|Olt|Iskar|Maritsa|Vardar|Struma|Aliakmonas|Kura|Aras|Terek|Kuban|Oka|Kama|Belaya|Vyatka|Sukhona|Angara|Selenga|Aldan|Vilyuy|Indigirka|Yana|
-Anadyr|Ussuri|Songhua|Liao|Han|Xi|Min|Tarim|Ili|Brahmani|Tapti|Son|Gandak|Kosi|Ghaghara|Teesta|Padma|Meghna|Jamuna|Karnaphuli|Red River of the North:5|Hackensack|Passaic|
-Raritan|Schuylkill|Lehigh|Juniata|Anacostia|Patuxent|Chester|Elk|Pocomoke|Nanticoke|Choptank`, 'river the rio');
+Anadyr|Ussuri|Songhua|Liao|Han|Xi|Min|Tarim|Ili|Brahmani|Tapti|Son|Gandak|Kosi|Ghaghara|Teesta|Padma|Meghna|Jamuna|Karnaphuli|Red River of the North:4|Hackensack|Passaic|
+Raritan|Schuylkill|Lehigh|Juniata|Anacostia|Patuxent|Chester|Elk|Pocomoke|Nanticoke|Choptank|Onyx/onyx river:5`, 'river the rio');
 
 /* Rare answers: answer key, part 3 (science and animals). */
 R('Chemical elements', 'Name a chemical element.', `Oxygen/o|Hydrogen/h|Carbon/c|Gold/au|Iron/fe|Helium/he|Nitrogen/n|Silver/ag|Copper/cu|Sodium/na|Calcium/ca|Neon/ne|Aluminum/aluminium/al|Lead/pb|
@@ -861,7 +881,7 @@ Cesium/caesium/cs|Barium/ba|Bismuth/bi|Strontium/sr|Selenium/se|Germanium/ge|Gal
 Rubidium/rb|Vanadium/v|Scandium/sc|Yttrium/y|Zirconium/zr|Niobium/nb|Molybdenum/mo|Technetium/tc|Ruthenium/ru|Rhodium/rh|Palladium/pd|Cadmium/cd|Hafnium/hf|Tantalum/ta|
 Rhenium/re|Osmium/os|Iridium/ir|Lanthanum/la|Cerium/ce|Praseodymium/pr|Neodymium/nd|Promethium/pm|Samarium/sm|Europium/eu|Gadolinium/gd|Terbium/tb|Dysprosium/dy|
 Holmium/ho|Erbium/er|Thulium/tm|Ytterbium/yb|Lutetium/lu|Actinium/ac|Thorium/th|Protactinium/pa|Neptunium/np|Americium/am|Curium/cm|Berkelium/bk|Californium/cf|
-Einsteinium/es|Fermium/fm|Mendelevium/md|Nobelium/no|Lawrencium/lr|Rutherfordium/rf|Dubnium/db|Seaborgium/sg|Bohrium/bh|Hassium/hs|Meitnerium/mt|Darmstadtium/ds|
+Einsteinium/es|Fermium/fm|Mendelevium/md|Nobelium/no|Lawrencium/lr|Rutherfordium/rf|Dubnium/db|Seaborgium/sg|Bohrium/bh|Hassium/hs|Meitnerium/mt|Darmstadtium/ds:5|
 Roentgenium/rg|Copernicium/cn|Nihonium/nh|Flerovium/fl|Moscovium/mc|Livermorium/lv|Tennessine/ts|Oganesson/og`, 'element');
 
 R('Gases at room temperature', 'Name an element that is a gas at room temperature.', `Oxygen/o/o2|Hydrogen/h/h2|Helium/he|Nitrogen/n/n2|Neon/ne|Argon/ar|Chlorine/cl|Fluorine/f|Krypton/kr|Xenon/xe|Radon/rn|Oganesson/og:5`, 'gas element');
@@ -877,7 +897,7 @@ Springbok|Dik-dik|Gerenuk|Bongo|Nyala|Sable antelope|Water buffalo|Zebu|Gaur|Ban
 Colobus|Macaque|Howler monkey|Spider monkey|Squirrel monkey|Tamarin|Proboscis monkey|Snow leopard|Clouded leopard|Sun bear|Sloth bear|Spectacled bear|Binturong|Civet|Genet|
 Fossa|Kinkajou|Coati|Ringtail|Quokka|Wombat|Wallaby|Tasmanian devil|Numbat|Bilby|Quoll|Sugar glider|Bandicoot|Cuscus|Dugong|Narwhal|Beluga|Blue whale|Humpback whale|
 Sperm whale|Gray whale/grey whale|Right whale|Minke whale|Bowhead whale|Porpoise|River dolphin|Elephant seal|Leopard seal|Fur seal|Harbor seal|Sea otter|Dormouse|Jerboa|
-Kangaroo rat|Flying squirrel|Naked mole rat|Agouti|Paca|Mara|Degu|Tenrec|Solenodon|Colugo/flying lemur|Tree shrew|Hyrax|Fennec fox|Arctic fox|Red fox|Gray fox|Maned wolf|
+Kangaroo rat|Flying squirrel|Naked mole rat|Agouti|Paca|Mara|Degu|Tenrec|Solenodon:5|Colugo/flying lemur|Tree shrew|Hyrax|Fennec fox|Arctic fox|Red fox|Gray fox|Maned wolf|
 African wild dog/painted dog|Dhole|Bush dog|Raccoon dog|Red wolf|Ethiopian wolf|Honey badger/ratel|Marten|Fisher|Sable|Polecat|Giant anteater|Tamandua|Three-toed sloth|
 Two-toed sloth|Pygmy hippo|Bonobo|Mule deer|White-tailed deer|Red deer|Fallow deer|Roe deer|Muntjac|Sika deer|Chital|Sambar|Water deer|Mouse deer/chevrotain|Vicuna|Guanaco|
 Dromedary|Bactrian camel|Przewalski's horse/wild horse|Mammoth/woolly mammoth|Mastodon|Saber-toothed cat/sabertooth/smilodon|Woolly rhinoceros|Giant ground sloth|Dire wolf|
@@ -899,9 +919,9 @@ Jacamar|Puffbird|Barbet|Honeyguide|Sapsucker|Flicker|Lyrebird|Bowerbird|Bird-of-
 Shoebill|Hamerkop|Jabiru|Marabou|Tufted titmouse|Goldfinch|House finch|Purple martin|Martin|Mallard|Wood duck|Teal|Pintail|Canvasback|Merganser|Eider|Scaup|Bufflehead|
 Goldeneye|Shelduck|Canada goose|Snow goose|Mute swan|Trumpeter swan|Black swan|Whooping crane|Sandhill crane|Great blue heron/blue heron|Night heron|Jay|Steller's jay|
 Scrub jay|Nutcracker|Chough|Jackdaw|Rook|Blue tit|Great tit|Bullfinch|Chaffinch|Linnet|Siskin|Crossbill|Redpoll|Wagtail|Pipit|Dipper|Accentor|Babbler|Bulbul|White-eye|
-Honeyeater|Pardalote|Fairywren|Kookaburra|Galah|Weka|Takahe|Tui|Bellbird|Fantail|Robin redbreast:4|Wild turkey|Prairie chicken|Sage grouse|Turkey vulture|Black vulture|
+Honeyeater|Pardalote|Fairywren|Kookaburra|Galah|Weka|Takahe|Tui|Bellbird|Fantail|Robin redbreast:3|Wild turkey|Prairie chicken|Sage grouse|Turkey vulture|Black vulture|
 Lammergeier/bearded vulture|Caracara|Merlin|Hobby|Gyrfalcon|Kittiwake|Fulmar|Storm petrel|Tropicbird|Boatbill|Limpkin|Trumpeter|Seriema|Kagu|Sunbittern|Finfoot|Jacana|
-Pratincole|Courser|Sheathbill|Sandgrouse|Mousebird|Coucal|Ani|Hoatzin|Potoo|Frogmouth|Oilbird|Tinamou|Screamer|Magpie goose|Steamer duck|Wigeon|Gadwall|Shoveler|
+Pratincole|Courser|Sheathbill|Sandgrouse|Mousebird|Coucal|Ani|Hoatzin:5|Potoo|Frogmouth|Oilbird|Tinamou|Screamer|Magpie goose|Steamer duck|Wigeon|Gadwall|Shoveler|
 Ruddy duck|Harlequin duck|Mandarin duck|Muscovy duck|Pekin duck|Barnacle goose|Brant|Greylag goose|Bar-headed goose|Nene|Cockerel|Bantam|Silkie`, 'bird birds');
 
 R('Sea creatures', 'Name a fish or other sea creature.', `Shark|Salmon|Tuna|Goldfish|Clownfish|Trout|Cod|Catfish|Bass|Swordfish|Octopus|Jellyfish/jelly fish|Starfish/sea star/star fish|Crab|Lobster|Shrimp|Squid|Whale shark|
@@ -920,8 +940,8 @@ Barbel|Zander|Archerfish|Mudskipper|Blobfish|Viperfish|Gulper eel|Hatchetfish|La
 Mandarinfish|Sea lion|Sea dragon|Pipefish|Sea spider|Sea squirt|Sea pen|Brittle star|Feather star|Sea lily|Portuguese man o' war/man o war|Box jellyfish|Comb jelly|Isopod|
 Giant squid|Colossal squid|Vampire squid|Dumbo octopus|Blue-ringed octopus|Mimic octopus|Sea butterfly|Limpet|Periwinkle|Cockle|Razor clam|Geoduck|Quahog|Langoustine|
 Spiny lobster|Slipper lobster|Coconut crab|Fiddler crab|Ghost crab|Spider crab|Japanese spider crab|Sea robin|Batfish|Flathead|Halfbeak|Needlefish|Ladyfish|Milkfish|
-Grunion|Silverside|Sculpin|Greenling|Wolf eel|Wolffish|Ocean sunfish:4|Opah|Ribbonfish|Cutlassfish|Escolar|Barramundi|Basa|Swai|Pangasius|Arapaima|Pacu|
-Snakehead|Bichir|Ropefish|Elephantfish|Knifefish|Zebra shark|Leopard shark|Wobbegong|Angel shark|Sixgill shark|Greenland shark|Cookiecutter shark|Frilled shark`,
+Grunion|Silverside|Sculpin|Greenling|Wolf eel|Wolffish|Ocean sunfish:3|Opah|Ribbonfish|Cutlassfish|Escolar|Barramundi|Basa|Swai|Pangasius|Arapaima|Pacu|
+Snakehead|Bichir|Ropefish|Elephantfish|Knifefish|Zebra shark|Leopard shark|Wobbegong|Angel shark|Sixgill shark|Greenland shark|Cookiecutter shark|Frilled shark|Barreleye/barreleye fish/spookfish:5`,
   'fish sea creature animal');
 
 R('Insects and bugs', 'Name an insect or other bug.', `Ant|Bee|Butterfly|Fly/flies|Mosquito|Beetle|Ladybug/ladybird|Grasshopper|Cricket|Dragonfly|Moth|Wasp|Cockroach/roach|Spider|Termite|Flea|Tick|Louse/lice|
@@ -934,11 +954,11 @@ Sphinx moth|Clothes moth|Katydid|Locust|Leafhopper|Planthopper|Treehopper|Spittl
 Giant water bug|Cochineal|Botfly|Blowfly|Crane fly|Sand fly|Black fly|Deer fly|Tsetse fly|Hoverfly|Robber fly|Midge|No-see-um|Springtail|Booklouse|Bristletail|Mole cricket|
 Cave cricket|Camel cricket|Jerusalem cricket/potato bug|Weta|Grub|Maggot|Larva|Inchworm|Mealworm|Glowworm|Woolly bear|Pill bug/roly poly/rolly polly/sow bug/woodlouse|Mite|
 Chigger|Daddy longlegs/harvestman|Black widow|Brown recluse|Wolf spider|Jumping spider|Orb weaver|Tarantula|Firebrat|Dust mite|Lovebug|Leaf insect|
-Earthworm/worm:5|Slug:5|Snail:5|Ladybeetle|Longhorn beetle|Leaf beetle|Flea beetle|Carpet beetle|Blister beetle|Bombardier beetle|Goliath beetle|Titan beetle|Jewel beetle|
+Earthworm/worm:4|Slug:4|Snail:4|Ladybeetle|Longhorn beetle|Leaf beetle|Flea beetle|Carpet beetle|Blister beetle|Bombardier beetle|Goliath beetle|Titan beetle|Jewel beetle|
 Scarab|Cockchafer|Rove beetle|Burying beetle|Soldier beetle|Darkling beetle|Mosquito hawk|Cabbage white|Red admiral|Blue morpho|Skipper|Hairstreak|Fritillary|Viceroy|
 Owl butterfly|Glasswing|Birdwing|Death's-head hawkmoth|Tiger moth|Io moth|Cecropia moth|Polyphemus moth|Codling moth|Pantry moth|Bagworm|Tent caterpillar|Armyworm|Cutworm|
 Hornworm|Bollworm|Cankerworm|Fungus gnat|Drain fly|Phorid fly|Stable fly|Bluebottle|Greenbottle|Cluster fly|Snakefly|Dobsonfly|Hellgrammite|Alderfly|Owlfly|Webspinner|
-Zorapteran|Walking leaf|Jumping bristletail`, 'insect bug bugs');
+Zorapteran/angel insect:5|Walking leaf|Jumping bristletail`, 'insect bug bugs');
 
 R('Dog breeds', 'Name a breed of dog.', `Labrador/labrador retriever/lab|Golden retriever/golden|German shepherd/alsatian|Poodle|Bulldog/english bulldog|Beagle|Chihuahua/chiwawa/chiuaua/chiwauwau/chihuahau|Husky/siberian husky|Pug|
 French bulldog/frenchie|Dachshund/wiener dog/sausage dog/doxie/daschund/dashund/dachsund|Rottweiler/rottie|Boxer|Corgi/pembroke welsh corgi|Shih Tzu|Great Dane|Border collie|Doberman/doberman pinscher|
@@ -961,22 +981,22 @@ Akbash|Kuvasz|Maremma sheepdog|Polish lowland sheepdog|Pumi|Mudi|Catahoula leopa
 Kai Ken|Kishu|Hokkaido|Tosa|Chinook|Greenland dog|Canadian Eskimo dog|Yakutian laika|Swedish vallhund|Cardigan Welsh corgi|Entlebucher|Appenzeller|Greater Swiss mountain dog|
 Neapolitan mastiff|Dogue de Bordeaux/french mastiff|Boerboel|Presa Canario|Fila Brasileiro|American bulldog|Olde English bulldogge|Boykin spaniel|Clumber spaniel|Field spaniel|
 Sussex spaniel|Welsh springer spaniel|Irish water spaniel|American water spaniel|Wirehaired pointing griffon|Spinone Italiano|Bracco Italiano|Small Munsterlander|
-Large Munsterlander|German wirehaired pointer|Pudelpointer|Slovensky cuvac|Sloughi|Azawakh|Silken windhound|Mudhol hound|Chart Polski|Basset Fauve de Bretagne|
-Petit Basset Griffon Vendeen/pbgv|Grand Basset Griffon Vendeen|Beagle harrier|Mexican hairless:4`, 'dog dogs breed puppy');
+Large Munsterlander|German wirehaired pointer|Pudelpointer|Slovensky cuvac|Sloughi|Azawakh:5|Silken windhound|Mudhol hound|Chart Polski|Basset Fauve de Bretagne|
+Petit Basset Griffon Vendeen/pbgv|Grand Basset Griffon Vendeen|Beagle harrier|Mexican hairless:3`, 'dog dogs breed puppy');
 
 /* Rare answers: answer key, part 4 (food, sport, music, culture). */
 R('Fruits', 'Name a fruit.', `Apple|Banana|Orange|Grape|Strawberry|Watermelon|Pineapple|Mango|Peach|Pear|Cherry|Blueberry|Raspberry|Lemon|Lime|Kiwi/kiwifruit|Cantaloupe|Honeydew|Plum|
 Apricot|Coconut|Pomegranate|Grapefruit|Blackberry|Cranberry|Papaya|Avocado|Tomato|Fig|Date|Nectarine|Tangerine|Clementine|Mandarin|Persimmon|Guava|Passion fruit|
 Dragon fruit/pitaya/pitahaya|Lychee/litchi|Starfruit/carambola/star fruit|Jackfruit|Durian|Rambutan|Mangosteen|Longan|Kumquat|Quince|Gooseberry|Elderberry|Boysenberry|
 Loganberry|Mulberry|Currant|Blackcurrant/black currant|Redcurrant/red currant|Huckleberry|Lingonberry|Cloudberry|Salmonberry|Acai|Goji berry/goji|Olive|Plantain|Tamarind|
-Breadfruit|Soursop/guanabana|Cherimoya/custard apple|Sugar apple/sweetsop|Atemoya|Pawpaw|Feijoa|Jabuticaba|Acerola|Camu camu|Cupuacu|Ackee|Sapodilla|Mamey|Canistel|
+Breadfruit|Soursop/guanabana|Cherimoya/custard apple|Sugar apple/sweetsop|Atemoya|Pawpaw|Feijoa|Jabuticaba:5|Acerola|Camu camu|Cupuacu|Ackee|Sapodilla|Mamey|Canistel|
 Star apple|Loquat|Medlar|Jujube|Pomelo|Yuzu|Ugli fruit/ugli|Bergamot|Citron|Blood orange|Cara cara orange|Navel orange|Valencia orange|Key lime|Finger lime|Kaffir lime|
 Calamansi|Meyer lemon|Granny Smith|Honeycrisp|Gala apple/gala|Fuji apple/fuji|Red Delicious|Golden Delicious|McIntosh|Pink Lady|Muskmelon|Casaba|Crenshaw|Galia|
 Horned melon/kiwano|Canary melon|Santa Claus melon|Melon|Berry|Physalis/ground cherry/cape gooseberry|Tomatillo|Salak/snake fruit|Langsat|Duku|Marang|Santol|Bilimbi|
 Miracle fruit|Ice cream bean|Monstera deliciosa|Prickly pear/cactus fruit/tuna fruit|Buddha's hand|Chokeberry/aronia|Serviceberry/saskatoon/juneberry|Barberry|Sea buckthorn|
 Rose hip/rosehip|Hawthorn berry|Sloe|Damson|Greengage|Mirabelle|Pluot|Aprium|Plumcot|Tangelo|Tangor|Satsuma|Minneola|Dekopon/sumo citrus/sumo|Asian pear/nashi|Bosc pear|
 Bartlett pear|Anjou pear|Crabapple/crab apple|Rowan berry|Wineberry|Dewberry|Marionberry|Tayberry|Olallieberry|Bilberry|Raisin|Prune|Sultana|Craisin|Dried apricot|
-Cucumber:5|Pumpkin:5|Squash:5|Eggplant:5|Bell pepper:5|Corn:5|Pea pod:5|Okra:5|Chili pepper:5|Grape tomato|Cherry tomato|Concord grape|Red grape|Green grape|Cotton candy grape|
+Cucumber:4|Pumpkin:4|Squash:4|Eggplant:4|Bell pepper:4|Corn:4|Pea pod:4|Okra:4|Chili pepper:4|Grape tomato|Cherry tomato|Concord grape|Red grape|Green grape|Cotton candy grape|
 Champagne grape|Muscadine|Scuppernong|Lemon drop|Pink grapefruit|White grapefruit|Mandarin orange|Seville orange|Bitter orange|Kabosu|Sudachi|Calamondin|Limequat|
 Orangequat|Wax apple/rose apple|Java plum|Jamun|Amla/indian gooseberry|Bael|Wood apple|Kokum|Karonda|Phalsa|Chikoo|Sitaphal|Ramphal|Mangaba|Pequi|Bacuri|Pitanga/surinam cherry|
 Grumichama|Uvaia|Araza|Lucuma|Naranjilla/lulo|Tamarillo/tree tomato|Pepino|Babaco|Granadilla|Maracuya|Curuba`);
@@ -988,7 +1008,7 @@ Swiss chard/chard|Endive|Escarole|Radicchio|Watercress|Fennel|Kohlrabi|Rutabaga/
 Scallion/green onion/spring onion|Chives|Edamame|Lima beans/lima bean|Black beans|Kidney beans|Chickpeas/garbanzo beans/chickpea|Lentils/lentil|Snap peas|Snow peas|
 Sugar snap peas|Butternut squash|Acorn squash|Spaghetti squash|Delicata squash|Kabocha|Yellow squash|Bitter melon/bitter gourd|Chayote|Taro|Cassava/yuca/manioc|Lotus root|
 Bamboo shoots|Bean sprouts|Water chestnut|Sunchoke/jerusalem artichoke|Salsify|Burdock|Romaine|Iceberg lettuce|Butter lettuce|Mustard greens|Dandelion greens|Turnip greens|
-Beet greens|Microgreens|Sprouts|Alfalfa sprouts|Napa cabbage|Red cabbage|Savoy cabbage|Broccolini|Broccoli rabe/rapini|Romanesco|Cardoon|Celtuce|Sorrel|Purslane|
+Beet greens|Microgreens|Sprouts|Alfalfa sprouts|Napa cabbage|Red cabbage|Savoy cabbage|Broccolini|Broccoli rabe/rapini|Romanesco|Cardoon|Celtuce:5|Sorrel|Purslane|
 Amaranth greens|Malabar spinach|Water spinach|Tatsoi|Mizuna|Frisee|Nopales/cactus paddle|Plantain|Poblano|Habanero|Serrano|Anaheim pepper|Banana pepper|Pepperoncini|
 Cayenne|Ghost pepper|Sweet corn|Baby corn|Olives/olive|Pickle|Seaweed|Kelp|Nori|Portobello|Shiitake|Cremini|Button mushroom|Oyster mushroom|Enoki|Chanterelle|Morel|Truffle|
 Parsley|Cilantro/coriander|Basil|Russet potato|Yukon Gold|Red potato|Fingerling potato|Purple potato|New potato|Pinto beans|Navy beans|Cannellini beans|Fava beans/broad beans|
@@ -1009,7 +1029,7 @@ Formula One/f1/formula 1|Rally racing/rally|Drag racing|Karting/go karting|Motor
 Long jump|High jump|Pole vault|Triple jump|Shot put|Discus|Javelin|Hammer throw|Hurdles|Sprinting|Relay|Steeplechase|Race walking|Weightlifting|Powerlifting|Bodybuilding|
 CrossFit|Strongman|Arm wrestling|Sumo/sumo wrestling|Jiu-jitsu/bjj/brazilian jiu jitsu|Aikido|Kung fu|Wushu|Capoeira|Muay Thai|Krav Maga|Kendo|Sambo|Savate|Water skiing|
 Wakeboarding|Kitesurfing|Windsurfing|Paddleboarding/stand up paddleboarding/sup|Bodyboarding/boogie boarding|Artistic swimming/synchronized swimming|Open water swimming|Freediving|
-Scuba diving|Spearfishing|Fishing|Hunting:5|Shooting/sport shooting|Skeet shooting|Trap shooting|Orienteering|Parkour|Trampoline|Tumbling|Acrobatics|Mountaineering|
+Scuba diving|Spearfishing|Fishing|Hunting:4|Shooting/sport shooting|Skeet shooting|Trap shooting|Orienteering|Parkour|Trampoline|Tumbling|Acrobatics|Mountaineering|
 Ice climbing|Ski jumping|Alpine skiing|Cross-country skiing|Freestyle skiing|Moguls|Nordic combined|Snowshoeing|Sledding|Ice fishing|Ice dancing|Broomball|Quidditch/quadball|
 Spikeball/roundnet|Cornhole|Horseshoes|Bocce|Petanque|Croquet|Lawn bowling/lawn bowls|Shuffleboard|Foosball|Air hockey|Jai alai|Pelota|Padel|Real tennis|Fives|Rackets|
 Paddle tennis|Platform tennis|Beach volleyball|Sitting volleyball|Wheelchair basketball|Goalball|Boccia|Sled hockey|Wheelchair rugby|Powerchair football|Blind football|
@@ -1017,8 +1037,8 @@ Sport climbing|Speed climbing|Canoe slalom|Sprint kayak|Dragon boat racing|Outri
 Cliff diving|High diving|Skydiving|BASE jumping|Hang gliding|Paragliding|Gliding|Air racing|Ballooning|Wingsuit flying|Bungee jumping|Zorbing|Sandboarding|Snowkiting|
 Skibobbing|Skijoring|Dog sledding/mushing|Camel racing|Greyhound racing|Harness racing|Show jumping|Dressage|Eventing|Barrel racing|Team roping|Steer wrestling|Calf roping|
 Gymkhana|Vaulting|Endurance riding|Hobby horsing|Tug of war|Highland games|Caber toss|Stone put|Log rolling|Lumberjack sports|Axe throwing|Bowls|Ten-pin bowling|
-Candlepin bowling|Duckpin bowling|Skee-ball|Pinball:5|Jump rope/skipping/double dutch|Hula hooping|Yo-yo:5|Juggling:5|Speedcubing:5|
-Poker:5|Bridge:5|Go:5|Checkers:5|Fantasy football:5|Step:5|Drill team|Color guard|Marching band:5|Baton twirling|Synchronized skating`);
+Candlepin bowling|Duckpin bowling|Skee-ball|Pinball:4|Jump rope/skipping/double dutch|Hula hooping|Yo-yo:4|Juggling:4|Speedcubing:4|
+Poker:4|Bridge:4|Go:4|Checkers:4|Fantasy football:4|Step:4|Drill team|Color guard|Marching band:4|Baton twirling|Synchronized skating|Chess boxing/chessboxing:5`);
 
 R('Musical instruments', 'Name a musical instrument.', `Piano|Guitar|Drums/drum/drum set/drum kit|Violin/fiddle|Flute|Trumpet|Saxophone/sax|Cello|Clarinet|Harp|Ukulele/uke|Bass guitar/bass|Electric guitar|
 Trombone|Tuba|Harmonica|Accordion|Xylophone|Keyboard|Organ|Banjo|Mandolin|Oboe|Bassoon|French horn/horn|Viola|Double bass/upright bass/contrabass/string bass|Piccolo|Recorder|
@@ -1029,27 +1049,27 @@ Sousaphone|Mellophone|Alto saxophone/alto sax|Tenor saxophone/tenor sax|Baritone
 Fife|Tin whistle/penny whistle|Shakuhachi|Bansuri|Erhu|Pipa|Guzheng|Koto|Shamisen|Biwa|Taiko|Oud|Bouzouki|Balalaika|Charango|Cuatro|Tres|Bandura|Kantele|Hurdy-gurdy|
 Nyckelharpa|Viola da gamba|Harmonium|Concertina|Bandoneon|Calliope|Pipe organ|Clavichord|Fortepiano|Electric piano/rhodes|Keytar|Drum machine|Sampler|Turntables/turntable|
 Vocoder|Talk box|Wood block|Temple blocks|Claves|Guiro|Cabasa|Shekere|Agogo bells|Cuica|Surdo|Timbales|Tom-tom|Hi-hat|Crash cymbal|Ride cymbal|Tubular bells/chimes|Wind chimes|
-Handbells|Sleigh bells|Finger cymbals|Rainstick|Slide whistle|Whistle|Vuvuzela|Conch shell|Alphorn|Sackbut|Shawm|Crumhorn|Serpent|Ophicleide|Natural horn|Valve trombone|
+Handbells|Sleigh bells|Finger cymbals|Rainstick|Slide whistle|Whistle|Vuvuzela|Conch shell|Alphorn|Sackbut|Shawm|Crumhorn|Serpent|Ophicleide:5|Natural horn|Valve trombone|
 Piccolo trumpet|Pocket trumpet|Bass ukulele|Baritone ukulele|Twelve-string guitar/12 string guitar|Acoustic guitar|Classical guitar|Steel guitar|Pedal steel guitar|Lap steel guitar|
 Resonator guitar/dobro|Washtub bass|Kalimba/mbira/thumb piano|Balafon|Kora|Ngoni|Mridangam|Ghatam|Tanpura|Veena|Sarod|Santoor|Shehnai|Handpan|Hang drum|Tongue drum|Bodhran|
-Frame drum|Darbuka/doumbek|Riq|Daf|Tabor|Voice/vocals/singing:5|Spoons|Bones|Jug|Musical saw|Glass harmonica|Water glasses|Otamatone|Stylophone|Launchpad|MIDI controller|
+Frame drum|Darbuka/doumbek|Riq|Daf|Tabor|Voice/vocals/singing:4|Spoons|Bones|Jug|Musical saw|Glass harmonica|Water glasses|Otamatone|Stylophone|Launchpad|MIDI controller|
 Electric violin|Electric cello|Electric bass|Fretless bass|Upright piano|Grand piano|Digital piano|Toy piano|Player piano|Hammond organ|Wurlitzer|Mellotron|
 Moog|Modular synth|Clavinet|Ondes Martenot|Bass flute|Alto flute|Contrabass clarinet|E-flat clarinet|Heckelphone|Sarrusophone|Duduk|Zurna|Ney|Kaval|Gaida|Uilleann pipes|
 Highland bagpipes|Sheng|Suona|Dizi|Hulusi|Xiao|Guqin|Yangqin|Morin khuur|Kemenche|Rebab|Sarangi|Esraj|Dilruba|Rubab|Saz|Baglama|Tar|Kamancheh|Santur|Qanun|Dombra|Komuz|
 Gusli|Domra|Cimbalom|Tamburica|Cavaquinho|Bandola|Requinto|Vihuela|Guitarron|Quena|Siku|Bombo|Berimbau|Pandeiro|Repinique|Tamborim|Atabaque|Udu|Talking drum|Dundun|Bata drums|
 Ashiko|Tom drum|Floor tom|Octoban|Electronic drums`);
 
-R('Programming languages', 'Name a programming language.', `Python|JavaScript/js/java script|Java|C++/cpp/c plus plus|C|C#/c sharp/csharp|HTML:3|CSS:3|SQL|Scratch|Ruby|Go/golang|Rust|Swift|PHP|TypeScript/ts|Kotlin|R|MATLAB|
+R('Programming languages', 'Name a programming language.', `Python|JavaScript/js/java script|Java|C++/cpp/c plus plus|C|C#/c sharp/csharp|HTML:2|CSS:2|SQL|Scratch|Ruby|Go/golang|Rust|Swift|PHP|TypeScript/ts|Kotlin|R|MATLAB|
 Perl|Lua|Snap/snap!|Bash|Shell/shell script|PowerShell|Haskell|Fortran|COBOL|Lisp|Common Lisp|Scheme|Racket|Clojure|Julia|Scala|Dart|Assembly/asm/assembly language|Pascal|Delphi|
 BASIC|Visual Basic/vb|VBA|QBasic|Elixir|Erlang|Prolog|Objective-C/objective c/objc|OCaml|F#/f sharp|Zig|Ada|Logo|Smalltalk|Simula|ALGOL|APL|Forth|Groovy|CoffeeScript|Elm|
 PureScript|ReasonML|Crystal|Nim|D|V|Odin|Carbon|Mojo|Solidity|Vyper|Hack|ActionScript|ColdFusion|ABAP|Apex|RPG|PL/I/pl 1|SAS|Stata|Wolfram Language/mathematica|Maple|Octave|
-LabVIEW|Blockly|Alice|Processing|Arduino|VHDL|Verilog|SystemVerilog|GLSL|HLSL|CUDA|OpenCL|WebAssembly/wasm|Whitespace|Befunge|Malbolge|LOLCODE|Shakespeare Programming Language|
+LabVIEW|Blockly|Alice|Processing|Arduino|VHDL|Verilog|SystemVerilog|GLSL|HLSL|CUDA|OpenCL|WebAssembly/wasm|Whitespace|Befunge|Malbolge:5|LOLCODE|Shakespeare Programming Language|
 Chef|Piet|INTERCAL|AWK|sed|Tcl|Rexx|Ballerina|Haxe|Gleam|Idris|Agda|Coq|Lean|Eiffel|Modula-2|Oberon|Euphoria|AutoHotkey|AppleScript|Zsh|Batch/batch file|Raku/perl 6|Pony|
 Chapel|Mercury|Datalog|Hy|Janet|Fennel|Io|Red|Rebol|Factor|Joy|Self|Dylan|Boo|Vala|Xojo|Visual FoxPro/foxpro|Clipper|dBase|Lingo|HyperTalk|LiveCode|GDScript|UnrealScript|
-Squirrel|AngelScript|Pawn|JScript|VBScript|Roc|Unison|Koka|Wren|Ring|Pike|MUMPS/m|TI-BASIC|Small Basic|BlitzBasic|PureBasic|FreeBASIC|GW-BASIC|Turing|Karel|AP pseudocode/pseudocode:5|
-App Inventor|Swift Playgrounds:5|Kodu|Python 3:5|Node.js/node:4|React:5|jQuery:5|JSON:5|XML:5|Markdown:5|LaTeX:5|YAML:5|Excel formulas/excel:5|Bash script:5|
-Q#|Cobra|Nemerle|Genie|ATS|Ceylon|Fantom|Frege|Hope|Miranda|ML|Standard ML/sml|Clean|Curry|Oz|Scratch Jr/scratchjr|Tynker|Code.org blocks:5|Bitsy:5|GameMaker Language/gml|
-Lua script:5|Luau|MoonScript|Terra|Jai|Hare|Vale|Austral|Carp|Kitten|Rye|Ruby on Rails:5|Django:5|Flutter:5`);
+Squirrel|AngelScript|Pawn|JScript|VBScript|Roc|Unison|Koka|Wren|Ring|Pike|MUMPS/m|TI-BASIC|Small Basic|BlitzBasic|PureBasic|FreeBASIC|GW-BASIC|Turing|Karel|AP pseudocode/pseudocode:4|
+App Inventor|Swift Playgrounds:4|Kodu|Python 3:4|Node.js/node:3|React:4|jQuery:4|JSON:4|XML:4|Markdown:4|LaTeX:4|YAML:4|Excel formulas/excel:4|Bash script:4|
+Q#|Cobra|Nemerle|Genie|ATS|Ceylon|Fantom|Frege|Hope|Miranda|ML|Standard ML/sml|Clean|Curry|Oz|Scratch Jr/scratchjr|Tynker|Code.org blocks:4|Bitsy:4|GameMaker Language/gml|
+Lua script:4|Luau|MoonScript|Terra|Jai|Hare|Vale|Austral|Carp|Kitten|Rye|Ruby on Rails:4|Django:4|Flutter:4`);
 
 R('Greek gods and Titans', 'Name a god, goddess, or Titan from Greek mythology.', `Zeus/jupiter/jove|Poseidon/neptune|Hades/pluto|Athena/athene/minerva|Apollo|Aphrodite/venus|Ares/mars|Hermes/mercury|Artemis/diana|Hera/juno|
 Dionysus/dionysos/bacchus|Hephaestus/hephaistos/vulcan|Demeter/ceres|Persephone/kore/proserpina|Hestia/vesta|Eros/cupid|Kronos/cronus/saturn|Atlas|Prometheus|Gaia/gaea/ge|
@@ -1057,11 +1077,11 @@ Nike/victoria|Pan/faunus|Helios/sol|Selene/luna|Eos/aurora|Hecate/hekate|Iris|Hy
 Uranus/ouranos/caelus|Rhea|Oceanus/okeanos|Hyperion|Themis|Mnemosyne|Tethys|Phoebe|Coeus|Crius|Iapetus|Theia|Epimetheus|Menoetius|Leto|Asteria|Metis|Dione|Chaos|Tartarus|
 Erebus|Nyx/nox|Aether|Hemera|Pontus|Ourea|Thalassa|Chronos|Ananke|Phanes|Eileithyia|Harmonia|Enyo|Eris/discordia|Phobos|Deimos|Priapus|Hymenaeus/hymen|Aeolus|Boreas|
 Zephyrus|Notus|Eurus|Triton|Proteus|Nereus|Amphitrite|Thetis|Galatea|Glaucus|Palaemon|Leucothea|Charon|Calliope|Clio|Erato|Euterpe|Melpomene|Polyhymnia|Terpsichore|
-Thalia|Urania|Aglaea|Euphrosyne|Clotho|Lachesis|Atropos|Alecto|Megaera|Tisiphone|Heracles/hercules:4|Psyche|Plutus|Kratos|Bia|Zelus|Styx|Achelous|Alpheus|Astraea|Dike|
-Eirene|Eunomia|Nomos|Momus|Oizys|Hesperus|Phosphorus/eosphorus|Pallas|Perses|Astraeus|Aristaeus|Iacchus|Silenus|Melinoe|Macaria|Zagreus|Typhon:5|Muses/muse:4|
-Fates/moirai:4|Furies/erinyes:4|Graces/charites:4|Horae/hours:4|Titans/titan:4|Olympians:5|Hesperides|Pleiades|Hyades|Oceanids|Nereids|Naiads|Dryads|Satyrs|Nymphs:5|
-Ganymede|Endymion:5|Hygieia|Panacea|Iaso|Aceso|Epione|Peitho|Pothos|Himeros|Anteros|Hedone|Ate|Lyssa|Geras|Moros|Keres|Oneiroi|
-Brizo|Benthesikyme|Ceto|Phorcys|Eurybia|Thaumas|Electra|Maia|Arke|Lelantos|Clymene|Eurynome|Doris|Circe:5|Calypso:5`);
+Thalia|Urania|Aglaea|Euphrosyne|Clotho|Lachesis|Atropos|Alecto|Megaera|Tisiphone|Heracles/hercules:3|Psyche|Plutus|Kratos|Bia|Zelus|Styx|Achelous|Alpheus|Astraea|Dike|
+Eirene|Eunomia|Nomos|Momus|Oizys:5|Hesperus|Phosphorus/eosphorus|Pallas|Perses|Astraeus|Aristaeus|Iacchus|Silenus|Melinoe|Macaria|Zagreus|Typhon:4|Muses/muse:3|
+Fates/moirai:3|Furies/erinyes:3|Graces/charites:3|Horae/hours:3|Titans/titan:3|Olympians:4|Hesperides|Pleiades|Hyades|Oceanids|Nereids|Naiads|Dryads|Satyrs|Nymphs:4|
+Ganymede|Endymion:4|Hygieia|Panacea|Iaso|Aceso|Epione|Peitho|Pothos|Himeros|Anteros|Hedone|Ate|Lyssa|Geras|Moros|Keres|Oneiroi|
+Brizo|Benthesikyme|Ceto|Phorcys|Eurybia|Thaumas|Electra|Maia|Arke|Lelantos|Clymene|Eurynome|Doris|Circe:4|Calypso:4`);
 
 R('Shakespeare plays', 'Name a play by William Shakespeare.', `Romeo and Juliet/romeo juliet|Hamlet|Macbeth/the scottish play|Othello|King Lear/lear|A Midsummer Night's Dream/midsummer nights dream/midsummer|Julius Caesar|
 The Tempest/tempest|Much Ado About Nothing/much ado|Twelfth Night|The Merchant of Venice/merchant of venice|The Taming of the Shrew/taming of the shrew|As You Like It|
@@ -1069,14 +1089,14 @@ Richard III/richard the third/richard 3|Henry V/henry the fifth/henry 5|Antony a
 All's Well That Ends Well/alls well|Richard II/richard the second/richard 2|Henry IV/henry the fourth/henry 4/henry iv part 1/henry iv part 2|Coriolanus|Titus Andronicus|Cymbeline|
 Pericles/pericles prince of tyre|Timon of Athens|Troilus and Cressida|The Two Gentlemen of Verona/two gentlemen of verona|Love's Labour's Lost/loves labours lost/loves labors lost|
 King John|Henry VI/henry the sixth/henry 6/henry vi part 1/henry vi part 2/henry vi part 3|Henry VIII/henry the eighth/henry 8|The Merry Wives of Windsor/merry wives of windsor|
-The Two Noble Kinsmen/two noble kinsmen|Edward III/edward the third|Sir Thomas More:5|Cardenio:5|Love's Labour's Won:5`);
+The Two Noble Kinsmen/two noble kinsmen|Edward III/edward the third|Sir Thomas More:4|Cardenio:5|Love's Labour's Won:4`);
 
 R('Constellations', 'Name a constellation.', `Orion/orions belt|Ursa Major/big dipper/great bear|Leo|Cassiopeia|Scorpius/scorpio|Taurus|Gemini|Sagittarius|Ursa Minor/little dipper/little bear|Andromeda|Pegasus|
 Cancer|Virgo|Libra|Capricornus/capricorn|Aquarius|Pisces|Aries|Draco|Cygnus/northern cross/swan|Perseus|Hercules|Canis Major/great dog|Lyra|Centaurus|Crux/southern cross|Aquila|
 Bootes|Ophiuchus|Cepheus|Auriga|Corona Borealis/northern crown|Lupus|Monoceros|Antlia|Apus|Ara|Caelum|Camelopardalis|Canes Venatici|Canis Minor|Carina|Cetus|Chamaeleon|
 Circinus|Columba|Coma Berenices|Corona Australis|Corvus|Crater|Delphinus|Dorado|Equuleus|Eridanus|Fornax|Grus|Horologium|Hydra|Hydrus|Indus|Lacerta|Leo Minor|Lepus|Lynx|
-Mensa|Microscopium|Musca|Norma|Octans|Pavo|Phoenix|Pictor|Piscis Austrinus|Puppis|Pyxis|Reticulum|Sagitta|Sculptor|Scutum|Serpens|Sextans|Telescopium|Triangulum|
-Triangulum Australe|Tucana|Vela|Volans|Vulpecula|Pleiades/seven sisters:4|Summer Triangle:5|Winter Triangle:5|Teapot:5|Great Square of Pegasus:5|Argo Navis:5`);
+Mensa:5|Microscopium|Musca|Norma|Octans|Pavo|Phoenix|Pictor|Piscis Austrinus|Puppis|Pyxis|Reticulum|Sagitta|Sculptor|Scutum|Serpens|Sextans|Telescopium|Triangulum|
+Triangulum Australe|Tucana|Vela|Volans|Vulpecula|Pleiades/seven sisters:3|Summer Triangle:4|Winter Triangle:4|Teapot:4|Great Square of Pegasus:4|Argo Navis:4`);
 
 /* Rare answers: answer key, part 5 (games, words, everyday things). */
 R('Board and card games', 'Name a board game or card game.', `Monopoly|Chess|Checkers/draughts|Uno|Scrabble|Clue/cluedo|Sorry|Risk|Candy Land/candyland|The Game of Life/life/game of life|Battleship|Connect Four/connect 4|
@@ -1089,10 +1109,10 @@ The Resistance|Avalon|Secret Hitler|Werewolf|Mafia|One Night Ultimate Werewolf|L
 Betrayal at House on the Hill|Twilight Struggle|Diplomacy|Axis and Allies|Battle Cry|Memoir 44|Twilight Imperium|Cosmic Encounter|Talisman|HeroQuest|
 Mastermind|Rummikub|Scattergories|Trivial Pursuit|Balderdash|Outburst|Pit|Mille Bornes|Set|Blokus|Quarto|Quoridor|Hive|Santorini|Onitama|Tsuro|Kingdomino|
 Qwirkle|Bananagrams|Upwords|Tak|Shogi|Xiangqi/chinese chess|Janggi|Nine Men's Morris|Tic-tac-toe/tic tac toe/noughts and crosses|Dots and boxes|Hex|Pente|Gomoku|Nim|
-Senet|Royal Game of Ur/game of ur|Pachisi|Carrom|Crokinole|Shut the Box|Farkle|Liar's Dice|Bunco|Craps|Roulette:5|Cranium|Charades:4|Heads Up:5|Telestrations|Wavelength|
+Senet|Royal Game of Ur/game of ur:5|Pachisi|Carrom|Crokinole|Shut the Box|Farkle|Liar's Dice|Bunco|Craps|Roulette:4|Cranium|Charades:3|Heads Up:4|Telestrations|Wavelength|
 Just One|Decrypto|Spyfall|Herd Mentality|Sorry Sliders|Don't Break the Ice|Perfection|Pay Day|Uno Flip|Uno Attack|Dos|Concentration/memory|Snap|Beggar My Neighbour|Whist|Bid Whist|Hand and Foot|Oh Hell|Sheepshead|Skat|Schafkopf|Belote|
 Tarot|Scopa|Briscola|Durak|Big Two|Tien Len|Hanafuda|Karuta|Bang!/bang|Munchkin|Fluxx|Unstable Unicorns|Here to Slay|Throw Throw Burrito|Taco Cat Goat Cheese Pizza|
-Sleeping Queens|Monopoly Deal|Star Realms|Netrunner|Keyforge|Lorcana|Flesh and Blood|Gwent:5`);
+Sleeping Queens|Monopoly Deal|Star Realms|Netrunner|Keyforge|Lorcana|Flesh and Blood|Gwent:4`);
 
 R('Colors', 'Name a color.', `Red|Blue|Green|Yellow|Orange|Purple|Pink|Black|White|Brown|Gray/grey|Violet|Indigo|Turquoise|Teal|Maroon|Navy/navy blue|Beige|Tan|Gold|Silver|Magenta|Cyan|
 Lavender|Lilac|Mint/mint green|Olive|Peach|Coral|Salmon|Crimson|Scarlet|Burgundy|Ruby|Rose|Fuchsia|Hot pink|Baby blue|Sky blue|Royal blue|Cobalt|Sapphire|Azure|Cerulean|
@@ -1107,8 +1127,8 @@ Oxblood|Claret|Merlot|Garnet|Alizarin|Rose madder|Platinum|Titanium white|Snow|A
 Greige|Mushroom|Stone|Putty|Lemon chiffon|Banana|Butter|Primrose|Jonquil|Daffodil|Sunflower|Dandelion|Maize|School bus yellow|Safety orange|International orange|Blaze orange|
 Fluorescent yellow/highlighter yellow|Neon orange|Neon yellow|Hot magenta|Shocking pink|Bright pink|Dark blue|Light blue|Dark green|Light green|Dark red|Light pink|Pastel pink|
 Pastel blue|Pastel green|Pastel purple|Off white|Cadet blue|Dodger blue|Turquoise blue|Caribbean blue|Lagoon|Ocean blue|Marine|Sea blue|Teal blue|Duck egg|Eggplant purple|
-Imperial blue|Persian blue|Lapis lazuli|Indigo dye|Blue violet|Red violet|Yellow green|Blue green|Red orange|Yellow orange|Aero|Celeste|Zaffre|Smalt|Glaucous|Liver:5|
-Coquelicot|Falu red|Xanadu|Gamboge|Fulvous|Wenge|Bistre|Caput mortuum|Isabelline|Mikado yellow|Arylide yellow|Orpiment|Smaragdine|Feldgrau|Nyanza|Vantablack|Rainbow:5|Clear/transparent:5`);
+Imperial blue|Persian blue|Lapis lazuli|Indigo dye|Blue violet|Red violet|Yellow green|Blue green|Red orange|Yellow orange|Aero|Celeste|Zaffre|Smalt|Glaucous|Liver:4|
+Coquelicot:5|Falu red|Xanadu|Gamboge|Fulvous|Wenge|Bistre|Caput mortuum|Isabelline|Mikado yellow|Arylide yellow|Orpiment|Smaragdine|Feldgrau|Nyanza|Vantablack|Rainbow:4|Clear/transparent:4`);
 
 R('Jobs', 'Name a job or occupation.', `Teacher|Doctor/physician|Nurse|Lawyer/attorney|Police officer/cop/policeman/policewoman|Firefighter/fireman|Chef/cook|Engineer|Dentist|Farmer|Pilot|Scientist|Artist|Musician|
 Actor/actress|Writer/author|Accountant|Mechanic|Plumber|Electrician|Carpenter|Veterinarian/vet|Pharmacist|Cashier|Waiter/waitress/server|Janitor/custodian|Construction worker|
@@ -1118,7 +1138,7 @@ Judge|Secretary|Receptionist|Manager|CEO/chief executive|Salesperson/sales rep|R
 Babysitter/nanny|Lifeguard|Security guard|Flight attendant/stewardess|Designer|Graphic designer|Fashion designer|Interior designer|Web developer|Data scientist|
 Video game designer/game developer|YouTuber/content creator|Influencer|Streamer|Model|Dancer|Singer|Comedian|Magician|Clown|Painter|Sculptor|Florist|Gardener|Landscaper|
 Welder|Roofer|Mason/bricklayer|House painter/painter house|Locksmith|Tailor|Seamstress|Cobbler/shoemaker|Jeweler|Blacksmith|Fisherman|Miner|Logger/lumberjack|Rancher|Cowboy|
-Zookeeper|Park ranger|Forest ranger|Detective|Private investigator/pi|FBI agent|Spy:4|Politician|Mayor|Governor|Senator|President|Diplomat|Ambassador|Economist|Statistician|
+Zookeeper|Park ranger|Forest ranger|Detective|Private investigator/pi|FBI agent|Spy:3|Politician|Mayor|Governor|Senator|President|Diplomat|Ambassador|Economist|Statistician|
 Mathematician|Physicist|Chemist|Biologist|Geologist|Astronomer|Meteorologist/weatherman|Archaeologist|Anthropologist|Historian|Sociologist|Linguist|Translator/interpreter|
 Editor|Publisher|Proofreader|Copywriter|Novelist|Poet|Screenwriter|Playwright|Director|Producer|Cinematographer|Animator|Illustrator|Cartoonist|Composer|Conductor|DJ/disc jockey|
 Radio host|News anchor|Weather forecaster|Sports commentator/announcer|Referee/umpire|Personal trainer|Physical therapist|Occupational therapist|Speech therapist|Chiropractor|
@@ -1142,7 +1162,7 @@ Prompt engineer|Esports player/pro gamer|Professional athlete|Jockey|Racecar dri
 Auctioneer|Pawnbroker|Antique dealer|Appraiser|Bounty hunter|Bodyguard|Bouncer|Prison guard/correctional officer|Bailiff|Paralegal|Court reporter/stenographer|Notary|Clerk|
 Census taker|Lobbyist|Activist|Union organizer|Shepherd|Beekeeper|Falconer|Dog walker|Pet groomer|Dog trainer|Horse trainer|Veterinary technician/vet tech|Wildlife biologist|
 Game warden|Fishery worker|Crab fisherman|Oyster farmer|Vintner/winemaker|Brewer|Distiller|Cheesemaker|Candlemaker|Potter|Glassblower|Weaver|Knitter|Quilter|Upholsterer|
-Woodworker|Cabinetmaker|Luthier|Piano tuner|Watchmaker|Clockmaker|Gunsmith|Silversmith|Goldsmith|Engraver|Printer|Bookbinder|Calligrapher|Sign painter|Muralist`);
+Woodworker|Cabinetmaker|Luthier:5|Piano tuner|Watchmaker|Clockmaker|Gunsmith|Silversmith|Goldsmith|Engraver|Printer|Bookbinder|Calligrapher|Sign painter|Muralist`);
 
 R('Clothing', 'Name an item of clothing.', `Shirt/t-shirt/t shirt/tee|Pants/trousers|Jeans|Shorts|Dress|Skirt|Jacket|Coat|Sweater/jumper/pullover|Hoodie/hooded sweatshirt|Socks/sock|Shoes/shoe|Hat|Scarf|Gloves/glove|
 Underwear|Boxers|Briefs|Bra|Pajamas/pyjamas/pjs|Sweatpants/joggers|Leggings|Tank top|Blouse|Suit|Tie/necktie|Vest|Polo shirt/polo|Button-down shirt/button up|Cardigan|Blazer|
@@ -1151,13 +1171,13 @@ Bikini|Swim trunks/board shorts|Raincoat|Windbreaker|Parka|Puffer jacket|Overall
 Cape|Cloak|Mittens/mitten|Earmuffs|Bandana|Headband|Sweatshirt|Crop top|Camisole|Tube top|Halter top|Turtleneck|Henley|Flannel|Jersey|Uniform|Apron|Lab coat|Scrubs|Bow tie|
 Suspenders|Cummerbund|Corset|Bodysuit|Leotard|Tights/pantyhose|Stockings|Knee socks|Ankle socks|Thermals/long johns|Undershirt|Slip|Nightgown|Negligee|Kaftan|Tunic|Toga|
 Dashiki|Hanbok|Cheongsam/qipao|Ao dai|Dirndl|Lederhosen|Serape|Huipil|Sombrero|Fedora|Trilby|Bowler hat/derby|Top hat|Cowboy hat|Bucket hat|Sun hat|Visor|
-Beret|Balaclava/ski mask|Hijab|Turban|Fez|Yarmulke/kippah|Veil|Tiara:5|Crown:5|Snow pants|Ski jacket|Wetsuit|Rash guard|Cargo pants|Chinos|Khakis|Corduroys|Capris|
+Beret|Balaclava/ski mask|Hijab|Turban|Fez|Yarmulke/kippah|Veil|Tiara:4|Crown:4|Snow pants|Ski jacket|Wetsuit|Rash guard|Cargo pants|Chinos|Khakis|Corduroys|Capris|
 Culottes|Palazzo pants|Bell-bottoms|Skinny jeans|Mom jeans|Cargo shorts|Bermuda shorts|Bike shorts|Miniskirt|Maxi dress|Sundress|Cocktail dress|Prom dress|Wedding dress|
 Ball gown|Petticoat|Pencil skirt|Tutu|Peacoat|Trench coat|Duffle coat|Fleece|Anorak|Bomber jacket|Leather jacket|Denim jacket/jean jacket|Varsity jacket/letterman jacket|
-Track jacket|Shacket|Gilet|Waistcoat|Sport coat|Smoking jacket|Dinner jacket|Morning coat|Tailcoat|Frock coat|Spats|Galoshes/rain boots/wellies/wellingtons|Clogs|Crocs|Moccasins|
+Track jacket|Shacket|Gilet|Waistcoat|Sport coat|Smoking jacket|Dinner jacket|Morning coat|Tailcoat|Frock coat|Spats:5|Galoshes/rain boots/wellies/wellingtons|Clogs|Crocs|Moccasins|
 Espadrilles|Oxfords|Brogues|Mary Janes|Ballet flats/flats|Wedges|Platforms|Stilettos|Pumps|Mules|Slides|Hiking boots|Combat boots|Cowboy boots|Chelsea boots|Ugg boots/uggs|
-Converse:4|Cleats|Skates:4|Ascot|Cravat|Neckerchief|Shawl|Pashmina|Stole|Wrap|Sash|Garter|Arm warmers|Leg warmers|Wristband|Sweatband|Ear warmers|Neck gaiter|Face mask:4|
-Bandeau|Sports bra|Bralette|Boxer briefs|Thong|Jockstrap|Compression shorts|Swim cap|Goggles:5|Sunglasses:4|Watch:5|Jewelry:5|Backpack:5|Purse:5|Wallet:5|Mask:5|Costume|
+Converse:3|Cleats|Skates:3|Ascot|Cravat|Neckerchief|Shawl|Pashmina|Stole|Wrap|Sash|Garter|Arm warmers|Leg warmers|Wristband|Sweatband|Ear warmers|Neck gaiter|Face mask:3|
+Bandeau|Sports bra|Bralette|Boxer briefs|Thong|Jockstrap|Compression shorts|Swim cap|Goggles:4|Sunglasses:3|Watch:4|Jewelry:4|Backpack:4|Purse:4|Wallet:4|Mask:4|Costume|
 Sweater vest|Shrug|Bolero|Duster|Housecoat|Muumuu|Caftan|Jellabiya|Thobe|Abaya|Burqa|Niqab|Chador|Kurta|Sherwani|Lehenga|Salwar kameez|Dhoti|Lungi|Barong|Guayabera|`);
 
 R('Literary devices', 'Name a literary device or figure of speech.', `Metaphor|Simile|Alliteration|Personification|Hyperbole|Onomatopoeia|Irony|Foreshadowing|Imagery|Repetition|Symbolism|Oxymoron|Allusion|Paradox|
@@ -1168,10 +1188,10 @@ Aphorism|Epigram|Epigraph|Epithet|Euphony|Cacophony|Rhyme|Internal rhyme|Slant r
 Haiku|Refrain|Diction|Syntax|Conflict|Climax|Resolution|Exposition|Rising action|Falling action|Denouement|Plot twist|Cliffhanger|In medias res|Frame story/frame narrative|
 Red herring|Deus ex machina|Chekhov's gun|MacGuffin|Foil|Protagonist|Antagonist|Hero|Anti-hero/antihero|Tragic flaw/hamartia|Hubris|Catharsis|Pathos|Ethos|Logos|Kairos|
 Stream of consciousness|Epiphany|Tragedy|Comedy|Bildungsroman|Epistolary|Vignette|Parallelism|Anadiplosis|Antimetabole|Antanaclasis|Paronomasia|Periphrasis|Circumlocution|
-Hyperbaton|Anastrophe|Tmesis|Ellipsis|Aposiopesis|Apophasis/paralipsis|Praeteritio|Accumulation|Amplification|Gradatio|Anticlimax|Bathos|Meiosis|Auxesis|
+Hyperbaton|Anastrophe|Tmesis:5|Ellipsis|Aposiopesis|Apophasis/paralipsis|Praeteritio|Accumulation|Amplification|Gradatio|Anticlimax|Bathos|Meiosis|Auxesis|
 Hendiadys|Hypallage/transferred epithet|Catachresis|Malapropism|Spoonerism|Kenning|Mondegreen|Neologism|Portmanteau|Palindrome|Anagram|Acrostic|Ekphrasis|Pathetic fallacy|
 Personae/persona|Diacope|Epizeuxis|Symploce|Mesodiplosis|Isocolon|Tricolon|Rule of three|Sibilance|Plosives|Elision|Synesthesia|Tautology|Pleonasm|Redundancy|Innuendo|
-Double entendre|Dysphemism|Exemplum|Parable|Fable|Myth|Legend:5|Tall tale:5|Hypotaxis|Parataxis|
+Double entendre|Dysphemism|Exemplum|Parable|Fable|Myth|Legend:4|Tall tale:4|Hypotaxis|Parataxis|
 Polyptoton|Antistrophe|Prolepsis|Analepsis|Metalepsis|Mise en abyme|Breaking the fourth wall|Verisimilitude|Pastiche|Homage|Intertextuality|Framing device|Suspense|
 Tension|Pacing|Atmosphere|Voice|Style|Objective correlative|Negative capability|Free indirect discourse/free indirect style|Interior monologue|Omniscient narrator|
 Limited narrator|Second person|Ambiguity|Nonsense verse|Limerick|Ode|Elegy|Villanelle|Sestina|Ballad|Epic|Volta|Envoi`);
@@ -1182,8 +1202,8 @@ Titan|Europa|Io|Ganymede|Callisto|Phobos|Deimos|Triton|Charon|Enceladus|Ceres|Er
 Phoebe|Janus|Epimetheus|Pandora|Prometheus|Atlas|Pan|Daphnis|Helene|Telesto|Calypso|Ymir|Paaliaq|Kiviuq|Siarnaq|Tarvos|Ijiraq|Albiorix|Amalthea|Himalia|Elara|Pasiphae|Sinope|
 Lysithea|Carme|Ananke|Leda|Thebe|Adrastea|Metis|Callirrhoe|Themisto|Miranda|Ariel|Umbriel|Titania|Oberon|Puck|Cordelia|Ophelia|Bianca|Cressida|Desdemona|Juliet|Portia|Rosalind|
 Belinda|Perdita|Mab|Cupid|Caliban|Sycorax|Prospero|Setebos|Stephano|Trinculo|Francisco|Margaret|Ferdinand|Nereid|Proteus|Larissa|Galatea|Despina|Thalassa|Naiad|Halimede|Sao|
-Laomedeia|Psamathe|Neso|Hippocamp|Nix|Hydra|Kerberos|Styx|Dysnomia|Hiiaka|Namaka|Vanth|Weywot|Xiangliu|Actaea|Ilmare|Varda|Salacia|Varuna:5|Ixion:5|Arrokoth:5|Vesta:5|Pallas:5|
-Hygiea:5|Juno:5|Planet Nine:5|Theia:5`);
+Laomedeia|Psamathe|Neso|Hippocamp:5|Nix|Hydra|Kerberos|Styx|Dysnomia|Hiiaka|Namaka|Vanth|Weywot|Xiangliu|Actaea|Ilmare|Varda|Salacia|Varuna:4|Ixion:4|Arrokoth:4|Vesta:4|Pallas:4|
+Hygiea:4|Juno:4|Planet Nine:4|Theia:4`);
 
 R('Dinosaurs', 'Name a dinosaur or prehistoric reptile.', `Tyrannosaurus rex/t rex/trex/tyrannosaurus|Triceratops|Velociraptor/raptor|Stegosaurus|Brachiosaurus|Brontosaurus|Pterodactyl/pterodactylus|Spinosaurus|
 Diplodocus|Ankylosaurus|Apatosaurus|Allosaurus|Parasaurolophus|Iguanodon|Pteranodon|Dilophosaurus|Pachycephalosaurus|Carnotaurus|Giganotosaurus|Mosasaurus|Plesiosaurus|
@@ -1192,8 +1212,8 @@ Maiasaura|Hadrosaurus|Edmontosaurus|Corythosaurus|Lambeosaurus|Styracosaurus|Pac
 Euoplocephalus|Nodosaurus|Sauropelta|Argentinosaurus|Patagotitan|Dreadnoughtus|Titanosaurus|Camarasaurus|Mamenchisaurus|Supersaurus|Sauroposeidon|Amargasaurus|Nigersaurus|
 Carcharodontosaurus|Acrocanthosaurus|Albertosaurus|Gorgosaurus|Daspletosaurus|Tarbosaurus|Yutyrannus|Dilong|Guanlong|Troodon|Struthiomimus|Ornithomimus|Deinocheirus|
 Suchomimus|Irritator|Megalosaurus|Torvosaurus|Majungasaurus|Abelisaurus|Mapusaurus|Tyrannotitan|Cryolophosaurus|Monolophosaurus|Sinosauropteryx|Caudipteryx|Anchiornis|
-Yi qi|Quetzalcoatlus|Rhamphorhynchus|Dimorphodon|Pterosaur|Ichthyosaurus/ichthyosaur|Elasmosaurus|Liopleurodon|Kronosaurus|Plesiosaur|Nothosaurus|Dimetrodon|Edaphosaurus|
-Lystrosaurus|Postosuchus|Sarcosuchus|Deinosuchus|Leedsichthys:5|Dunkleosteus:5|Helicoprion:5|Megalodon:5|Minmi|Leaellynasaura|Muttaburrasaurus|Australovenator|Ouranosaurus|
+Yi qi:5|Quetzalcoatlus|Rhamphorhynchus|Dimorphodon|Pterosaur|Ichthyosaurus/ichthyosaur|Elasmosaurus|Liopleurodon|Kronosaurus|Plesiosaur|Nothosaurus|Dimetrodon|Edaphosaurus|
+Lystrosaurus|Postosuchus|Sarcosuchus|Deinosuchus|Leedsichthys:4|Dunkleosteus:4|Helicoprion:4|Megalodon:4|Minmi|Leaellynasaura|Muttaburrasaurus|Australovenator|Ouranosaurus|
 Tenontosaurus|Hypsilophodon|Heterodontosaurus|Lesothosaurus|Scelidosaurus|Scutellosaurus|Huayangosaurus|Tuojiangosaurus|Gigantspinosaurus|Wuerhosaurus|Dacentrurus|Miragaia|
 Borealopelta|Gastonia|Polacanthus|Saichania|Tarchia|Pinacosaurus|Zuniceratops|Einiosaurus|Kosmoceratops|Diabloceratops|Sinoceratops|Regaliceratops|Achelousaurus|
 Shantungosaurus|Saurolophus|Tsintaosaurus|Olorotitan|Brachylophosaurus|Gryposaurus|Kritosaurus|Prosaurolophus|Leptoceratops|Bagaceratops|Stygimoloch|Dracorex|
@@ -1212,9 +1232,9 @@ Picometer|Angstrom|Femtometer|Decimeter|Hectometer|Decameter|Megameter|Gigameter
 Rod|Link|Mil|Thou|Hectare|Square foot|Square meter|Square mile|Cubic foot|Cubic meter|Cubic inch|Barrel|Bushel|Peck|Gill|Dram|Grain|Stone|Hundredweight|Long ton|Short ton|
 Metric ton/tonne|Carat|Karat|Troy ounce|Pennyweight|Microgram|Milligram|Megagram|Fluid ounce/fl oz|Shot|Jigger|Dash|Pinch|Smidgen|Drop|Cord|Board foot|Decade|Century|Millennium|
 Fortnight|Nanosecond|Millisecond|Microsecond|Picosecond|Leap year|Eon|Era|Epoch|Radian|Steradian|Arcminute|Arcsecond|Gradian|Revolution|RPM|Erg|Dyne|BTU|Therm|Electronvolt/ev|
-Foot-pound|Kilocalorie|Ampere-hour|Milliamp-hour/mah|Gigahertz/ghz|Megahertz/mhz|Kilohertz|Megapixel|Pixel|DPI|Point|Pica|Em|Nibble|Word:5|Baud|Bps/bits per second|
-Mach|Kph/km per hour|G-force|Rankine|Reaumur|pH|Richter scale|Beaufort scale|Mohs scale|Scoville unit|IQ point:5|Percent:5|Score:5|Dozen|Gross|Ream|Quire|Bale|Hogshead|Firkin|
-Kilderkin|Tun|Butt|Minim|Scruple|Ligne|Palm|Digit|Pace|Step:5|Smoot|Beard-second:5|Banana for scale:5|Jiffy|Shake|Svedberg|Planck length|Planck time`);
+Foot-pound|Kilocalorie|Ampere-hour|Milliamp-hour/mah|Gigahertz/ghz|Megahertz/mhz|Kilohertz|Megapixel|Pixel|DPI|Point|Pica|Em|Nibble|Word:4|Baud|Bps/bits per second|
+Mach|Kph/km per hour|G-force|Rankine|Reaumur|pH|Richter scale|Beaufort scale|Mohs scale|Scoville unit|IQ point:4|Percent:4|Score:4|Dozen|Gross|Ream|Quire|Bale|Hogshead|Firkin|
+Kilderkin|Tun|Butt|Minim|Scruple|Ligne|Palm|Digit|Pace|Step:4|Smoot:5|Beard-second:4|Banana for scale:4|Jiffy|Shake|Svedberg|Planck length|Planck time`);
 
 R('Kitchen items', 'Name something you would find in a kitchen.', `Refrigerator/fridge|Stove|Oven|Microwave|Sink|Dishwasher|Toaster|Blender|Spoon|Fork|Knife|Plate|Bowl|Cup|Mug|Glass|Pan/frying pan/skillet|Pot|Spatula|
 Whisk|Ladle|Cutting board|Kettle|Coffee maker/coffee machine|Can opener|Colander|Measuring cups|Measuring spoons|Mixing bowl|Baking sheet/cookie sheet|Oven mitt|Dish towel/tea towel|
@@ -1231,75 +1251,75 @@ Smoke detector|First aid kit|Broom|Mop|Dustpan|Vacuum|Recycling bin|Compost bin|
 Hand towel|Paper towel holder|Coffee|Tea|Milk|Eggs|Bread|Butter|Cheese|Fruit|Vegetables|Leftovers|Cereal|Snacks|Ketchup|Mustard|Mayonnaise|Olive oil|Vinegar|Honey|Peanut butter|
 Jam|Rice|Pasta|Canned food|Soup|Ice|Water|Juice|Soda|Baking soda|Baking powder|Yeast|Vanilla|Chocolate chips|Sprinkles|Food coloring|Toaster oven|Espresso machine|Kitchen scale|
 Popcorn maker|Ice cream maker|Bread maker/bread machine|Dehydrator|Sous vide|Panini press|Hot plate|Electric kettle|Milk frother|French press|Pour-over/pour over|Coffee grinder|
-Tea infuser|Gravy boat|Butter dish|Sugar bowl|Creamer|Salt shaker|Pepper grinder/pepper mill|Napkin holder|Centerpiece|Candle|Plant|Herb garden|Radio|TV|Cat:5|Dog:5|Mom:5|Chef:5|
-Cook:5|Lunch:5|Dinner:5|Breakfast:5|Grocery list|Shopping bag|Reusable bag|Freezer bag|Ice cube tray|Ice pack|Lunch bag|Food storage bags|Wax paper|Parchment paper|Silicone mat|
-Oven light|Burner|Stovetop|Pilot light|Gas line|Outlet|Light switch|Drawer|Shelf|Lazy Susan|Hook|Towel rack|Pot rack|Wine rack|Bar cart|Cocktail shaker|Muddler|Ice bucket`);
+Tea infuser|Gravy boat|Butter dish|Sugar bowl|Creamer|Salt shaker|Pepper grinder/pepper mill|Napkin holder|Centerpiece|Candle|Plant|Herb garden|Radio|TV|Cat:4|Dog:4|Mom:4|Chef:4|
+Cook:4|Lunch:4|Dinner:4|Breakfast:4|Grocery list|Shopping bag|Reusable bag|Freezer bag|Ice cube tray|Ice pack|Lunch bag|Food storage bags|Wax paper|Parchment paper|Silicone mat|
+Oven light|Burner|Stovetop|Pilot light|Gas line|Outlet|Light switch|Drawer|Shelf|Lazy Susan|Hook|Towel rack|Pot rack|Wine rack|Bar cart|Cocktail shaker|Muddler|Ice bucket|Spurtle:5`);
 
 R('Parts of a cell', 'Name a part of a cell (biology).', `Nucleus|Mitochondria/mitochondrion/powerhouse of the cell|Cell membrane/plasma membrane/membrane|Cytoplasm|Ribosome/ribosomes|Cell wall|Chloroplast|Vacuole|
 Golgi apparatus/golgi body/golgi/golgi complex|Endoplasmic reticulum/er|Rough endoplasmic reticulum/rough er|Smooth endoplasmic reticulum/smooth er|Lysosome|Nucleolus|DNA|Chromosome|
 Centriole|Cytoskeleton|Vesicle|Peroxisome|Flagellum/flagella|Cilia/cilium|Nuclear envelope/nuclear membrane|Chromatin|Centrosome|Cytosol|Nuclear pore|Microtubules/microtubule|
 Microfilaments/actin filaments|Intermediate filaments|Plasmodesmata|Central vacuole|Contractile vacuole|Food vacuole|Plastid|Chromoplast|Leucoplast|Amyloplast|Thylakoid|Grana/granum|
-Stroma|Cristae|Matrix|Glycocalyx|Pili/pilus|Fimbriae|Capsule|Nucleoid|Plasmid|RNA|mRNA|Proteins|Lipid bilayer|Phospholipids|Cholesterol:4|Receptor proteins|Channel proteins|
+Stroma|Cristae|Matrix|Glycocalyx|Pili/pilus|Fimbriae|Capsule|Nucleoid|Plasmid|RNA|mRNA|Proteins|Lipid bilayer|Phospholipids|Cholesterol:3|Receptor proteins|Channel proteins|
 Ion channels|Transport proteins|Gap junctions|Tight junctions|Desmosomes|Basal body|Spindle fibers|Kinetochore|Centromere|Telomere|Genes|Endosome|Phagosome|Proteasome|
-Glyoxysome|Vault|Secretory vesicle|Transport vesicle|Sarcoplasmic reticulum|Myofibrils|Axon:5|Dendrite:5|Pseudopod|Eyespot|Pellicle|Organelle:4|Membrane proteins`);
+Glyoxysome|Vault:5|Secretory vesicle|Transport vesicle|Sarcoplasmic reticulum|Myofibrils|Axon:4|Dendrite:4|Pseudopod|Eyespot|Pellicle|Organelle:3|Membrane proteins`);
 
-R('Trees', 'Name a kind of tree.', `Oak|Maple|Pine|Palm/palm tree|Birch|Willow/weeping willow|Cherry/cherry blossom|Apple|Redwood|Sequoia/giant sequoia|Spruce|Fir|Cedar|Elm|Ash|Aspen|Christmas tree:4|
+R('Trees', 'Name a kind of tree.', `Oak|Maple|Pine|Palm/palm tree|Birch|Willow/weeping willow|Cherry/cherry blossom|Apple|Redwood|Sequoia/giant sequoia|Spruce|Fir|Cedar|Elm|Ash|Aspen|Christmas tree:3|
 Cypress|Magnolia|Dogwood|Walnut|Chestnut|Beech|Sycamore|Poplar|Cottonwood|Hickory|Pecan|Hemlock|Juniper|Yew|Larch|Douglas fir|Baobab|Banyan|Eucalyptus|Acacia|Mahogany|Teak|
-Ebony|Bamboo:4|Olive|Orange|Lemon|Peach|Pear|Plum|Fig|Mango|Coconut|Date palm|Avocado|Almond|Cashew|Hazel|Holly|Hawthorn|Rowan|Alder|Linden/lime tree/basswood|Horse chestnut|
-Buckeye|Catalpa|Locust|Honey locust|Black locust|Mesquite|Joshua tree|Palo verde|Saguaro:5|Ginkgo|Dawn redwood|Monkey puzzle|Bristlecone pine|Ponderosa pine|White pine|
+Ebony|Bamboo:3|Olive|Orange|Lemon|Peach|Pear|Plum|Fig|Mango|Coconut|Date palm|Avocado|Almond|Cashew|Hazel|Holly|Hawthorn|Rowan|Alder|Linden/lime tree/basswood|Horse chestnut|
+Buckeye|Catalpa|Locust|Honey locust|Black locust|Mesquite|Joshua tree|Palo verde|Saguaro:4|Ginkgo|Dawn redwood|Monkey puzzle|Bristlecone pine|Ponderosa pine|White pine|
 Scots pine|Lodgepole pine|Loblolly pine|Longleaf pine|Jack pine|Pinyon pine|Sugar pine|Blue spruce|Norway spruce|Sitka spruce|Balsam fir|Fraser fir|Noble fir|Grand fir|
 Red cedar|Cedar of Lebanon|Deodar|Bald cypress|Leyland cypress|Arborvitae/thuja|Tamarack|Red maple|Sugar maple|Japanese maple|Silver maple|Norway maple|Box elder|Red oak|
 White oak|Live oak|Pin oak|Cork oak|Bur oak|River birch|Paper birch|Silver birch|Weeping cherry|Crabapple|Redbud|Tulip tree/tulip poplar|Sweetgum|Black gum/tupelo|
 Sassafras|Persimmon|Pawpaw|Mulberry|Osage orange|Jacaranda|Flame tree|Frangipani/plumeria|Rubber tree|Kapok|Ceiba|Cacao|Coffee tree|Tea tree|Cinnamon tree|
 Nutmeg tree|Clove tree|Sandalwood|Rosewood|Balsa|Ironwood|Lignum vitae|Dragon tree|Bottle tree|Quiver tree|Mangrove|Breadfruit|Jackfruit|Durian|Rambutan|Lychee|Tamarind|
-Neem|Peepal/bodhi tree/sacred fig|Ashoka|Sal|Wollemi pine|Kauri|Rimu|Totara|Pohutukawa|Kowhai|Silver fern:5|Bonsai:5|Fruit tree:4|Evergreen:4|Deciduous:5|Conifer:4`);
+Neem|Peepal/bodhi tree/sacred fig|Ashoka|Sal|Wollemi pine:5|Kauri|Rimu|Totara|Pohutukawa|Kowhai|Silver fern:4|Bonsai:4|Fruit tree:3|Evergreen:3|Deciduous:4|Conifer:3`);
 
 R('Flowers', 'Name a flower.', `Rose|Tulip|Daisy|Sunflower|Lily|Orchid|Daffodil|Carnation|Dandelion|Lavender|Lilac|Peony|Hydrangea|Marigold|Poppy|Iris|Violet|Pansy|
 Chrysanthemum/mum|Hibiscus|Lotus|Magnolia|Jasmine|Gardenia|Begonia|Petunia|Zinnia|Gerbera/gerbera daisy|Aster|Dahlia|Gladiolus|Snapdragon|Sweet pea|Morning glory|
 Geranium|Azalea|Rhododendron|Camellia|Cherry blossom|Bluebell|Buttercup|Clover|Forget-me-not|Foxglove|Hollyhock|Honeysuckle|Hyacinth|Impatiens|Larkspur|Lily of the valley|
 Lupine|Nasturtium|Oleander|Primrose|Ranunculus|Snowdrop|Statice|Sweet william|Tiger lily|Calla lily|Easter lily|Stargazer lily|Water lily|Wisteria|Bougainvillea|Plumeria/frangipani|Bird of paradise|Protea|Anemone|Anthurium|Amaryllis|Alstroemeria/peruvian lily|Baby's breath|Bleeding heart|Black-eyed Susan|
 Coneflower/echinacea|Columbine|Cosmos|Crocus|Cyclamen|Daylily|Delphinium|Edelweiss|Freesia|Fuchsia|Gazania|Heather|Hellebore|Hosta|Jonquil|Kalanchoe|Lantana|Lisianthus|
-Lobelia|Lotus flower:4|Mimosa|Moonflower|Narcissus|Orange blossom|Passionflower|Phlox|Poinsettia|Queen Anne's lace|Rose of Sharon|Salvia|Scabiosa|Sedum|
+Lobelia|Lotus flower:3|Mimosa|Moonflower|Narcissus|Orange blossom|Passionflower|Phlox|Poinsettia|Queen Anne's lace|Rose of Sharon|Salvia|Scabiosa|Sedum|
 Stephanotis|Stock|Strawflower|Sweet alyssum|Thistle|Trillium|Verbena|Vinca/periwinkle|Wallflower|Yarrow|Allium|Asclepias/milkweed|Bee balm|Blanket flower|
 Bluebonnet|Borage|Calendula|Candytuft|Celosia|Chamomile|Clematis|Corn flower/cornflower|Dianthus|Echium|Evening primrose|Four o'clock|Gaillardia|Gentian|Globe amaranth|
 Goldenrod|Heliotrope|Jacob's ladder|Kniphofia/red hot poker|Lady's slipper|Liatris|Mallow|Mandevilla|Marguerite|Meadowsweet|Monkshood|Nigella/love in a mist|
-Orange daylily|Oxalis|Plumbago|Pincushion flower|Portulaca/moss rose|Rafflesia|Corpse flower/titan arum|Saffron crocus|Sea holly|Shasta daisy|Spider lily|Spiderwort|Sweet violet|
-Tuberose|Water hyacinth|Wild rose|Wood anemone|Zephyranthes/rain lily|Plum blossom|Apple blossom|Dogwood|Redbud|Lilac bush:5|Weed:5|Bud:5`);
+Orange daylily|Oxalis|Plumbago|Pincushion flower|Portulaca/moss rose|Rafflesia:5|Corpse flower/titan arum|Saffron crocus|Sea holly|Shasta daisy|Spider lily|Spiderwort|Sweet violet|
+Tuberose|Water hyacinth|Wild rose|Wood anemone|Zephyranthes/rain lily|Plum blossom|Apple blossom|Dogwood|Redbud|Lilac bush:4|Weed:4|Bud:4`);
 
 R('Languages', 'Name a language people speak.', `English|Spanish/espanol/castilian|French|Chinese|Mandarin|German|Japanese|Italian|Russian|Arabic|Portuguese|Korean|Hindi|Cantonese|Latin|Greek|Hebrew|Dutch|
 Swedish|Norwegian|Danish|Finnish|Polish|Turkish|Vietnamese|Thai|Tagalog/filipino|Indonesian|Malay|Urdu|Bengali/bangla|Punjabi|Tamil|Telugu|Persian/farsi|Swahili|Ukrainian|
 Czech|Hungarian|Romanian|Irish/irish gaelic|Scottish Gaelic|Welsh|Icelandic|Sign language/asl/american sign language|Navajo|Cherokee|Hawaiian|Maori|Zulu|Xhosa|Afrikaans|Amharic|
 Somali|Yoruba|Igbo|Hausa|Nepali|Sinhala|Burmese|Khmer|Lao|Mongolian|Tibetan|Kazakh|Uzbek|Azerbaijani|Georgian|Armenian|Albanian|Serbian|Croatian|Bosnian|Slovenian|Slovak|
-Bulgarian|Macedonian|Lithuanian|Latvian|Estonian|Basque|Catalan|Galician|Breton|Cornish|Manx|Luxembourgish|Maltese|Yiddish|Esperanto|Klingon:5|Elvish/sindarin/quenya:5|
-Dothraki:5|Pig Latin:5|Sanskrit|Pali|Ancient Egyptian|Coptic|Aramaic|Akkadian|Sumerian|Old English|Old Norse|Gothic|Hittite|Etruscan|Gujarati|Marathi|Kannada|Malayalam|Odia|
+Bulgarian|Macedonian|Lithuanian|Latvian|Estonian|Basque|Catalan|Galician|Breton|Cornish|Manx|Luxembourgish|Maltese|Yiddish|Esperanto|Klingon:4|Elvish/sindarin/quenya:4|
+Dothraki:4|Pig Latin:4|Sanskrit|Pali|Ancient Egyptian|Coptic|Aramaic|Akkadian|Sumerian|Old English|Old Norse|Gothic|Hittite|Etruscan|Gujarati|Marathi|Kannada|Malayalam|Odia|
 Assamese|Sindhi|Pashto|Dari|Kurdish|Balochi|Tajik|Turkmen|Kyrgyz|Tatar|Bashkir|Chechen|Uyghur|Manchu|Hmong|Javanese|Sundanese|Balinese|Cebuano|Ilocano|Hiligaynon|Tongan|
 Samoan|Fijian|Tok Pisin|Haitian Creole|Jamaican Patois|Papiamento|Quechua|Aymara|Guarani|Nahuatl|Maya/yucatec maya|Mapudungun|Inuktitut|Cree|Ojibwe|Lakota|Dakota|Hopi|Zuni|
 Apache|Mohawk|Seneca|Choctaw|Chickasaw|Creek/muscogee|Shoshone|Comanche|Blackfoot|Yupik|Inupiaq|Aleut|Greenlandic|Sami|Faroese|Frisian|Low German|Swiss German|Flemish|Wolof|
 Fula/fulani|Lingala|Kikuyu|Luganda|Kinyarwanda|Kirundi|Shona|Sesotho|Setswana|Tsonga|Venda|Ndebele|Swati|Malagasy|Tigrinya|Oromo|Berber/tamazight|Hakka|Hokkien|
-Shanghainese|Wu|Min|Teochew|Taiwanese|Okinawan|Ainu|Tuvan|Buryat|Kalmyk|Chuvash|Udmurt|Komi|Mari|Mordvin|Sorbian|Romani|Ladino|Occitan|Corsican|Sardinian|Sicilian|Neapolitan|
+Shanghainese|Wu|Min|Teochew|Taiwanese|Okinawan|Ainu:5|Tuvan|Buryat|Kalmyk|Chuvash|Udmurt|Komi|Mari|Mordvin|Sorbian|Romani|Ladino|Occitan|Corsican|Sardinian|Sicilian|Neapolitan|
 Venetian|Friulian|Romansh|Asturian|Aragonese|Mirandese|Gascon|Walloon|Alsatian|Scots|Ulster Scots|Gullah|Cajun French|Louisiana Creole|Hawaiian Pidgin|Bislama|Pijin|Chamorro|
-Palauan|Marshallese|Chuukese|Pohnpeian|Kiribati|Tuvaluan|Nauruan|Tahitian|Rarotongan|Niuean|Tokelauan|Rapa Nui|Python:5|JavaScript:5|Body language:5|Emoji:5|Morse code:5|Braille:5`);
+Palauan|Marshallese|Chuukese|Pohnpeian|Kiribati|Tuvaluan|Nauruan|Tahitian|Rarotongan|Niuean|Tokelauan|Rapa Nui|Python:4|JavaScript:4|Body language:4|Emoji:4|Morse code:4|Braille:4`);
 
 R('Cheeses', 'Name a type of cheese.', `Cheddar|Mozzarella|Swiss|Parmesan/parmigiano reggiano|American cheese/american|Provolone|Brie|Gouda|Feta|Cream cheese|Pepper jack|Monterey Jack/jack|Colby|Colby jack|
 Ricotta|Cottage cheese|Blue cheese/bleu cheese|Gorgonzola|Goat cheese/chevre|Camembert|Muenster/munster|Havarti|Gruyere|Romano/pecorino romano|Pecorino|Asiago|Manchego|
 Mascarpone|Halloumi|Paneer|Burrata|String cheese|Velveeta|Queso fresco|Queso blanco|Cotija|Oaxaca|Edam|Emmental|Jarlsberg|Fontina|Taleggio|Stilton|Roquefort|Limburger|
 Wensleydale|Red Leicester|Double Gloucester|Cheshire|Lancashire|Caerphilly|Comte|Raclette|Reblochon|Epoisses|Pont-l'Eveque|Saint-Nectaire|Morbier|Cantal|
-Beaufort|Tomme|Port Salut|Boursin|Neufchatel|Fromage blanc|Quark|Labneh|Skyr:5|Kefalotyri|Kasseri|Manouri|Graviera|Mizithra|Scamorza|Stracchino|Stracciatella|Bocconcini|
+Beaufort|Tomme|Port Salut|Boursin|Neufchatel|Fromage blanc|Quark|Labneh|Skyr:4|Kefalotyri|Kasseri|Manouri|Graviera|Mizithra|Scamorza|Stracchino|Stracciatella|Bocconcini|
 Ciliegine|Fior di latte|Caciocavallo|Montasio|Grana Padano|Piave|Robiola|Castelmagno|Bel Paese|Cambozola|Danish blue|Maytag blue|Cabrales|Valdeon|Idiazabal|Mahon|Zamorano|
 Tetilla|Leerdammer|Maasdam|Tilsit|Butterkase|Appenzeller|Sbrinz|Tete de Moine|Vacherin|Mont d'Or|Gjetost/brunost|Nokkelost|
 Danbo|Esrom|Akkawi|Nabulsi|Jibneh|Domiati|Mish|Kashkaval|Sirene|Bryndza|Oscypek|Twarog|Tvorog|Sulguni|Chhena|Chura|Rushan|Kesong puti|Queso Chihuahua|
 Queso Panela|Requeson|Asadero|Queso de bola|Cheez Whiz|Kraft Singles|Laughing Cow|Babybel|Brick cheese|Wisconsin cheddar|Vermont cheddar|Sharp cheddar|Mild cheddar|
-White cheddar|Smoked gouda|Aged gouda|Baby Swiss|Lacy Swiss|Pimento cheese|Cheese curds|Squeaky cheese|Nacho cheese|Processed cheese|Vegan cheese|Nutritional yeast:5`);
+White cheddar|Smoked gouda|Aged gouda|Baby Swiss|Lacy Swiss|Pimento cheese|Cheese curds|Squeaky cheese|Nacho cheese|Processed cheese|Vegan cheese|Nutritional yeast:4|Casu marzu/casu martzu/maggot cheese:5`);
 
 R('Car brands', 'Name a car brand.', `Toyota|Ford|Honda|Chevrolet/chevy|Tesla|BMW|Mercedes-Benz/mercedes/benz|Nissan|Jeep|Volkswagen/vw|Audi|Hyundai|Kia|Subaru|Mazda|Dodge|Lexus|Ferrari|Lamborghini|
 Porsche|GMC|Ram|Cadillac|Buick|Chrysler|Lincoln|Acura|Infiniti|Volvo|Land Rover|Range Rover|Jaguar|Mitsubishi|Mini/mini cooper|Fiat|Alfa Romeo|Maserati|Bentley|Rolls-Royce/rolls royce|
 Aston Martin|McLaren|Bugatti|Pagani|Koenigsegg|Lotus|Genesis|Rivian|Lucid|Polestar|Fisker|Pontiac|Oldsmobile|Saturn|Plymouth|Mercury|Hummer|Scion|Saab|Suzuki|Isuzu|Daewoo|
 Datsun|DeLorean|AMC|Studebaker|Packard|Hudson|Nash|Edsel|Tucker|Peugeot|Renault|Citroen|Opel|Vauxhall|Skoda|SEAT|Cupra|Dacia|Lada|Tata|Mahindra|Maruti Suzuki|BYD|Geely|Chery|
 NIO|XPeng|Li Auto|Great Wall|Haval|Hongqi|SAIC|MG|Proton|Perodua|Holden|Smart|Maybach|Rimac|Pininfarina|Spyker|Noble|TVR|Morgan|Caterham|Ariel|Ginetta|Lagonda|
-Triumph|Austin|Morris|Rover|Riley|Wolseley|Humber|Hillman|Sunbeam|Lancia|Abarth|Autobianchi|Innocenti|De Tomaso|Iso|Bizzarrini|Cizeta|Vector|Saleen|SSC|Hennessey|Shelby|
+Triumph|Austin|Morris|Rover|Riley|Wolseley|Humber|Hillman|Sunbeam|Lancia|Abarth|Autobianchi|Innocenti|De Tomaso|Iso|Bizzarrini|Cizeta:5|Vector|Saleen|SSC|Hennessey|Shelby|
 Panoz|Mosler|Rossion|Lucra|Karma|Faraday Future|Lordstown|Canoo|Aptera|Elio|VinFast|Togg|Zotye|Changan|Dongfeng|FAW|GAC|JAC|Brilliance|Lynk & Co|Zeekr|Aiways|Wuling|
-Baojun|Ora|Tank|Jetour|Exeed|Seres|Voyah|Avatr|Leapmotor|Neta|Hozon|Daihatsu|Mitsuoka|Ssangyong/kgm|Renault Samsung|Iveco:5|Freightliner:5|
-Peterbilt:5|Kenworth:5|Mack:5|International:5|Harley-Davidson:5|Ducati:5|Kawasaki:5|Yamaha:5`);
+Baojun|Ora|Tank|Jetour|Exeed|Seres|Voyah|Avatr|Leapmotor|Neta|Hozon|Daihatsu|Mitsuoka|Ssangyong/kgm|Renault Samsung|Iveco:4|Freightliner:4|
+Peterbilt:4|Kenworth:4|Mack:4|International:4|Harley-Davidson:4|Ducati:4|Kawasaki:4|Yamaha:4`);
 
 /* Valid five-letter guesses, expanded from the hunspell en_US dictionary */
 const WORDS5 = 'aalii abaca aback abaft abamp abase abash abate abbes abbey abbot abeam abele abets abhor abide abies abler abmho abode abohm abort about above abuse abuts abuzz abysm abyss acari accel acerb ached aches achoo acids acing acini acmes acned acorn acred acres acrid acted actin actor acute adage adapt addax added adder addle adept adieu adios adits adman admen admin admit admix adobe adopt adore adorn adown adult adust adzes aecia aedes aegis aerie aeron affix afire afoot afore afoul afrit after again agama agape agate agave agent agger aggie aggro agile aging agios agist agita aglet agley aglow agone agony agora agree agric agron ahead aided aider aides ailed aimed aioli aired airts aisle aitch akees akene alack alarm alary alate album alder aldol aleph alert algae algal algid algin algor alias alibi alien align alike alive alkyd alkyl allay allee alley allot allow alloy allyl aloes aloft aloha aloin alone along aloof aloud alpha altar alter altos alula alums amahs amain amass amaze amber ambit amble ambos ambry amend ament amice amide amigo amine amino amiss amity amnio among amour ample amply amuse ancon anear anele anent angel anger angle angry angst anile anils anima anime anion anise ankhs ankle ankus annal annas annex annoy annul anoas anode anole anons anted antes antic antiq antis antre antsy anvil aorta apace apart apeak apery aphid aphis apian aping apish apnea aport appel apple apply apron apses apsis apter aptly aquas araks arbor arced archt ardeb ardor areal areas areca arena arete argal argil argol argon argot argue arias ariel arils arise armed armet armor aroid aroma arose arras array arris arrow arsed arsis arson artel artsy arums ascot ascus asdic ashed ashen ashes aside asked asker askew aspen asper aspic assai assay asses asset assoc aster astir atilt atlas atman atoll atoms atomy atone atony atria atrip attar attic audio audit auger aught augur aulic aulos aunts aural aurar auras auric aurum autos auxin avail avast avens avers avert avian avion avoid avoir avows await awake award aware awash awful awing awned awoke axial axils axing axiom axles axons ayahs ayins azide azine azoic azole azote azoth azure baaed babas babel babes babul baccy backs bacon badge badly bagel baggy bahts bails bairn baits baiza baize baked baker bakes balas balds baldy baled baler bales balks balky balls bally balms balmy balsa banal bands bandy banes bangs banjo banks banns barbs barde bards bared barer bares barfs barge baric barit barks barms barmy barns baron barre barye basal based baser bases basic basil basin basis basks basso baste batch bated bates bathe baths batik baton batty bauds bawds bawdy bawls bayed bayou bazar beach beads beady beaks beams beamy beano beans beard bears beast beats beaus beaut bebop becks bedel bedew bedim beech beefs beefy beeps beers beery beets befit befog began begat beget begin begot begum begun beige being belay belch belga belie belle bells belly below belts bemas bench bends bendy benne benny bents beret bergs berks berms berry berth beryl beset besom besot bests betas betel beths betta bevel bevvy bezel bhaji bhang bialy bible bicep biddy bides bidet bield biers biffs bifid bight bigot bijou biked biker bikes bilbo bilge bilks bills billy bimah bimbo binal binds bines binge bingo biome biota biped bipod birch birds birls birrs birth bises bison bitch biter bites bitts bitty blabs black blade blags blahs blain blame bland blank blare blase blast blate blats blaze bleak blear bleat blebs bleed bleep blend bless blimp blind bling blini blink blips bliss blitz bloat blobs block blocs blogs bloke blond blood bloom bloop blots blown blows blowy blued bluer blues bluet bluey bluff blunt blurb blurs blurt blush board boars boart boast boats bobby boded bodes bodge boffo bogey boggy bogie bogle bogon bogus boils boink bolas boles bolls bolos bolts bolus bombe bombs bonce bonds boned boner bones bongo bongs bonks bonne bonny bonus bonze boobs booby booed books booms boong boons boors boost booth boots booty booze boozy borak borax bored borer bores boric borne boron bosky bosom boson bossy botch botel bothy bough boule bound bouse bouts bovid bowed bowel bower bowls bowse boxed boxen boxer boxes boyar boyla bozos brace brach bract brads braes brags braid brail brain brake brand brant brash brass brats brave bravo brawl brawn braxy brays braze bread break bream brede breed brent breve brews bribe brick bride brief brier brigs brill brims brine bring brink briny brisk brits broad broch brock broil broke bronc brood brook broom brose broth brown brows bruin bruit brume brunt brush brute bubal bubba bucko bucks buddy budge bueno buffo buffs buggy bugle buhls build built bulbs bulge bulgy bulks bulky bulla bulls bully bumph bumps bumpy bunch bunco bungs bunks bunny bunts buoys buran burbs buret burgh burgs burin burka burke burls burly burns burnt burps burro burrs burry bursa burse burst busby bused buses bushy busks busts busty butch buteo butte butts butty butut butyl buxom buyer bwana bylaw byres bytes byway cabal cabby caber cabin cable cabob cacao cache cacti cadet cadge cadre cafes caffs caged cager cages cagey caird cairn caked cakes calks calla calls calms calve calyx camel cameo campo camps campy canal candy caned caner canes canna canny canoe canon canso canst canto cants canty caped caper capes capon capos caput carat carbs cards cared carer cares caret cargo carks carny carob carol carom carpi carps carry carse carte carts carve cased cases casks caste casts catch cater catty cauda caulk cauls cause caved caver caves cavie cavil cawed cease cecal cecum cedar ceded ceder cedes cedis ceiba celeb cella cello cells celom cense cento cents ceorl cered ceres ceria ceric ceros certs cesar cesta chads chafe chaff chain chair chalk champ chant chaos chape chaps chard chare charm charr chars chart chary chase chasm chats chaws cheap cheat check cheek cheep cheer chefs chela chemo chert chess chest chevy chews chewy chiao chick chico chide chief child chili chill chimb chime chimp china chine ching chink chino chins chips chirk chirm chirp chirr chits chive chivy chock chocs choir choke choli chomp chook chops chord chore chose chows chron chubs chuck chufa chuff chugs chump chums chunk churl churn churr chute chyle chyme ciaos cider cigar cilia cimex cinch circa cirri cisco cited cites civet civic civil clack clade claim clamp clams clang clank clans claps claro clary clash clasp class clave clavi claws clays clean clear cleat cleek clefs cleft clepe clerk clews click cliff climb clime cline cling clink clips clits cloak clock clods clogs clomb clomp clone clonk clops close cloth clots cloud clout clove clown cloys clubs cluck clued clues clump clung clunk clvii clxii clxiv clxix clxvi coach coact coals coaly coast coati coats cobia coble cobra cocci cocks cocky cocoa cocos codas coded coder codes codex codon coeds cogon cohos coifs coign coils coins coirs coked cokes colas colds coles coley colic colly colon color colts colza comas combe combo combs comdg comer comes comet comfy comic comma compo comps conch condo conga conic conns contd conte conto cooed cooee cooks cools coomb coons coops coots copal copay coped coper copes copra copse coral cords cored corer cores corgi coria corks corky corms corns cornu corny corps corse cosec coset costa coste costs cotes cotta couch cough could count coupe coups court couth coven cover coves covet covey covin cowed cower cowls coxae coxed coxes coyer coyly coypu cozen craal crabs crack craft crags crake cramp crams crane crank crape craps crapy crash crass crate crave crawl craws crays craze crazy creak cream credo creed creek creel creep creme crepe crept cress crest crews cribs crick cried crier cries crime crimp crine crisp croak crock croft crone cronk crony crook croon crops crore cross croup crowd crown crows croze cruck crude cruel cruet cruft crumb crump cruse crush crust crwth crypt cryst cubby cubeb cubed cuber cubes cubic cubit cuddy cuffs cuing cukes culch culet culex culls cully culms culpa cults cumin cunts cupel cupid cuppa curbs curch curds curdy cured curer cures curet curia curie curio curls curly curry curse curve curvy cusec cushy cusks cusps cutch cuter cutey cutie cutin cutis cutty cutup cycad cycle cylix cymar cymas cymes cynic cysts cyton czars daces dacha dadas daddy daffy dagos dahls daily dairy daisy dales dally daman damar dames damns damps dance dandy dangs danio dared darer dares daric darky darns darts dated dater dates datum daube daubs daunt davit dawns dazed dazes dding deals dealt dears deary death debag debit debts debus debut decaf decal decay decks decor decoy dedal deems deeps deify deign deist deity dekko delay delft delis dells delta delve demit demon demur denar denim denom dense dents depth derby deriv derma derry desks deter detox deuce devil dewan dhobi dhole dhoti dhows dials diary diazo diced dicer dices dicey dicks dicot dicta didst diets diffs dight digit diked dikes dildo dills dilly dimer dimes dimly dinar dined diner dines dinge dingo dings dingy dinky dints diode dippy dipso direr dirge dirks dirty disco dishy disks ditch ditsy ditto ditty divan divas dived diver dives divot divvy diwan dixie dizen dizzy dobby dobla dobra dobro docks dodge dodgy dodos doers doffs doges doggo doggy dogie dogma doily doing dolce doled doles dolls dolly dolor dolts domed domes donas donee donga dongs donna donne donor dooms doors doozy doped doper dopes dopey dorks dorky dorms dorty dosed doses doted doter dotes dotty doubt douce dough douma douse doves dowdy dowel dower dowie downs downy dowry dowse doyen dozed dozen dozer dozes drabs draff draft drags drain drake drama drams drank drape drawl drawn draws drays dread dream drear dregs dress dried drier dries drift drill drink drips drive droid droit droll drone drool droop drops dross drove drown drubs drugs druid drums drunk drupe druse dryad dryer dryly duads duals ducal ducat duchy ducks ducky ducts duded dudes duels duets duffs dukes dulia dulls dully dulse dumbo dummy dumps dumpy dunce dunes dungs dunks dunno duomo duped duper dupes duple duppy durra durst durum dusky dusts dusty dutch duvet dwarf dweeb dwell dwelt dyads dyers dying dykes dynes eager eagle eagre eared earls early earns earth eased easel eases eaten eater eaves ebbed ebony echos eclat edema edged edger edges edict edify edits educe educt eerie effed egads egest egged egger egret eider eidos eight eikon eject eking eland elate elbow elder elect elegy elemi elfin elide elite elope elude elute elver elves email embay embed ember embow embus emcee emend emery emirs emits emmer emmet emoji emote empty enact enate ended endow endue enema enemy engin enjoy ennui ensue enter entry envoi envoy eosin epact epees ephah ephod ephor epics epoch epode epoxy equal equip equiv erase erect ergot ernes erode erose erred error eruct erugo erupt esker essay ester estop ether ethic ethos ethyl etnas etude etuis euros evade evens event evert every evict evils evite evoke ewers exact exalt exams excel exeat execs exert exile exine exist exits exons expat expel expos extol extra exude exult exurb eyras eyrir fable faced facer faces facet facts faddy faded fader fades fadge faena faffs fagot fails faint fairs fairy faith faked faker fakes fakir falls false famed fancy fango fangs fanny fanon faqir farad farce farci farcy fared farer fares farms farts fasts fatal fated fates fatly fatso fatty fatwa faugh fault fauna fauns fauve faves favor favus fawns faxed faxes fayer fazed fazes fears feast feats fecal feces fecit feeds feels feeze feign feint felid fella fells felly felon felts femme femur fence fends fenny feoff feral feria fermi ferns ferny ferry fests fetal fetch feted fetes fetid fetor fetus feuar feuds fever fewer feyly fiats fiber fiche fichu ficus fidge fiefs field fiend fiery fifer fifes fifth fifty fight filar filch filed filer files filet fills filly films filmy filth filum final finch finds fined finer fines finis finks finny fired firer fires firms firry first firth fiscs fishy fists fitch fitly fiver fives fixed fixer fixes fizzy fjeld fjord flack flags flail flair flake flaky flame flank flans flaps flare flash flask flats flaws flawy flays fleam fleas fleck fleer flees fleet flesh flews flick flied flier flies fling flint flips flirt flite flits float flock flocs floes flogs flong flood floor flops flora flory floss flour flout flown flows flubs flues fluff fluid fluke fluky flume flump flung flunk fluor flush flute fluty flyby flyte foals foams foamy focal focus foehn foggy foils foist folds folia folic folie folio folks folly fonts foods fools foots footy foray forby force fordo fords fores forge forgo forks forme forms forte forth forts forty forum fossa fosse fouls found fount fours fovea fowls foxed foxes foyer frack frags frail frame franc frank fraps frats fraud frays freak freed freer frees fremd frena fresh frets friar fried fries frigs frill frisk frith fritz frize frizz frock frogs frond frons front frore frosh frost froth frown froze fruit frump fryer fubsy fucks fucus fudge fuels fugal fuggy fugue fulls fully fumed fumes funds fungi fungo funks funky funny furan furls furor furry furze furzy fused fusee fuses fusil fussy fusty futon fuzzy gabby gable gadid gaffe gaffs gaily gains gaits galah galas galea gales galls galop gamba gamed gamer games gamic gamin gamma gammy gamps gamut ganef gangs ganja ganof gaped gapes gappy garbs garth gases gasps gassy gated gater gates gator gauds gaudy gauge gaunt gaurs gauss gauze gauzy gavel gawks gawky gawps gayer gazed gazer gazes geans gears gecko geeks geeky geese geest gelds gelid gemma gemmy gemot genes genet genic genie genii genip genit genoa genre genro gents genus geode geoid gerah germs germy gesso getup ghats ghazi ghees ghost ghoul ghyll giant gibed giber gibes giddy gifts gigot gigue gilds gills gilts gimel gimme gimps gimpy ginny gipon girds girls girly giros girth girts gites given giver gives gizmo glace glade glads glair gland glans glare glary glass glaze gleam glean glebe glede gleet glens glias glide glint glitz gloam gloat globe globs gloms gloom glory gloss glove glows gloze glued glues gluey glume gluon gluts glyph gnarl gnash gnats gnaws gnome goads goals goats godly goers gofer going golds golem golfs golly gonad goner gongs gonif gonks gonna gonzo goods goody gooey goofs goofy gooks goons goose goosy gopak goral gored gores gorge gorps gorse goths gotta gouge gourd gouty gowan gowns goyim grabs grace grade grads graft grail grain grams grand grans grant grape graph grasp grass grate grave gravy grays graze great grebe greed green greet greps gride grids grief grift grill grime grimy grind grins gripe grips grist grith grits groan groat groin groks groom grope gross grosz grots group grout grove growl grown grows grubs gruel grues gruff grume grump grunt guaco guano guans guard guars guava gucks guess guest guide guild guile guilt guise gulag gulas gulch gules gulfs gulls gully gulps gumbo gumma gummy gunge gungy gunky gunny guppy gurge gurus gushy gussy gusto gusts gusty gutsy gutta gutty guyed guyot gypsy gyral gyres gyron gyros gyrus gyved gyves habit hacek hacks hades hadst hafiz hafts haiku hails hairs hairy hajes hajji hakes hakim halal haled haler hales halls halms halon halos halts halve hamal hames hammy hamza hance hands handy hangs hanks haole haply happy hards hardy hared harem hares harks harms harps harpy harry harsh harts hasps haste hasty hatch hated hater hates haugh haulm hauls haunt haven haver haves havoc hawed hawks hawse hayed hazan hazed hazel hazer hazes hdqrs heads heady heals heaps heard hears heart heath heats heave heavy heder hedge heeds heels hefts hefty heirs heist helix hello hells helms helot helps helve hemal hemic hemin hence henge henna henry herbs herby herds heres heron hertz heths hewed hewer hexad hexed hexer hexes hexyl hicks hided hider hides highs hight hijab hiked hiker hikes hills hilly hilts hilum hinds hinge hings hinny hints hippo hippy hired hirer hires hitch hived hives hoard hoars hoary hobby hobos hocks hocus hoers hogan hoick hoist hoked hokes hokey hokku hokum holds holed holes holey holly homed homer homes homey homos honed honer hones honey honks honky honor hooch hoods hooey hoofs hooks hooky hoops hoots hoped hopes horah horal horas horde horme horns horny horol horse horst hosed hoses hosta hosts hotel hotly hough hound houri hours house hovel hover howdy howls hubby huffs huffy huger hulas hulks hulky hulls human humic humid humor humph humps humpy humus hunch hunks hunky hunts hurds hurls hurry hurst hurts husks husky hussy hutch hydra hydro hyena hying hymen hymns hyoid hyped hyper hypes hypha hypos hyrax hyson iambi iambs ichor icier icily icing icons ictus ideal ideas idiom idiot idled idler idles idols idyll igloo ihram ileac ileal ileum ileus iliac ilium illus image imago imams imbue imide imine immix impel imper imply inane inbox inced incur incus indef index indic indie induc inept inert infer infin infra ingle ingot inion inkle inner innit instr intel inter intis intro inure inurn ioctl iodic ionic iotas irade irate irked irons irony irreg isles islet issei issue istle itchy items ivied ivies ivory ixtle izard jabot jacal jacks jaded jades jaggy jails jakes jalap jambs jammy japan japed japer japes jatos jaunt jawed jazzy jeans jebel jeeps jeers jello jells jelly jemmy jenny jerid jerks jerky jerry jests jetty jewel jibed jibes jiffs jiffy jihad jilts jimmy jingo jinks jinni jived jiver jives jivey jocko jocks joeys johns joins joint joist joked joker jokes jokey jolly jolts jolty jorum joule joust jowls jowly joyed judge jugal jugum juice juicy jujus julep jumbo jumps jumpy junco junks junta jupon jural jurat jurel juror jutty kafir kaiak kails kakis kalif kalis kalpa kanji kanzu kaons kaphs kapok kappa kaput karat karma karst karts kasha kauri kavas kayak kayos kazoo kebab kedge keels keens keeps kelly kenaf kendo kente kepis kerne ketch kevel keyed khaki khans kheda khoum kiang kibes kicks kicky kiddo kikes kills kilns kilos kilts kinas kinda kinds kines kings kinin kinks kinky kinos kiosk kited kites kitty kiwis klong kloof kluge klutz knack knaps knave knead kneed kneel knees knell knelt knife knish knits knobs knock knoll knots knout known knows knurl koala koans kobos kohls koine kolas kooks kooky kopje korma koses kotos kraal kraft krait kraut krill krona krone kroon kudos kudus kudzu kukri kulak kurus kvass kyats kyles kylix label labia labor laced lacer laces lacks laded laden lades ladle lagan lager laird lairs laity laker lakes lakhs lamas lambs lamed lamer lames lamia lamps lanai lance lands lanes lanky lapel lapin lapse larch lards lardy lares large largo larks larum larva lased laser lases lasso lasts latch lated later latex lathe lathi laths lathy latke latte lauds laugh lavas laved laver laves lawns laxer laxly layer layup lazar lazed lazes leach leads leafs leafy leaks leaky leans leaps leapt learn lease leash least leave ledge leech leeks leers leery lefts lefty legal leges leggy legit leman lemma lemme lemon lemur lends lenis lento leone leper lepta lethe letup levee level lever levin lewis lexer lexis liana liard liars libel liber libra licit licks lidos liege liens lifer lifts ligan liger light liked liken liker likes lilac lilos lilts limbo limbs limed limen limes limey limit limns limos limps lindy lined linen liner lines lingo lings linin links lints linty lions lipid lippy lisle lisps lists litas liter lithe litho lived liven liver lives livid livre llama llano loach loads loafs loams loamy loans loath lobar lobby lobed lobes local locks locos locum locus loden lodes lodge loess lofts lofty logan loges loggy logia logic login logon logos loins lolls lolly loner longe longs looby looks looms loons loony loops loopy loose loots loped loper lopes loppy loran lords loris lorry losel loser loses lotas lotic lotto lotus lough louis loupe lours louse lousy louts loved lover loves lovey lowed lower lowly loyal luaus lubed lubes lubra lucid lucks lucky lucre ludic luffa luffs luged luges lulls lulus lumen lumps lumpy lunar lunch lunge lungi lungs lupus lurch lured lures lurex lurgy lurid lurks lushy lusts lusty lutes luxes lweis lxvii lying lymph lynch lyres lyric lyses lysin lysis lyssa lytic lytta macaw maced maces macho macle macro madam madly mafia mages magic magma magus maids mails maims mains maize major maker makes makos malar males malls malts malty mamas mamba mambo mamey mamma mammy manas manat maned manes manga mange mango mangy mania manic manky manly manna manor manse manta manuf maple maras march marcs mares marge maria marka marks marls marly marry marsh marts maser masks mason massy masts match mated mater mates matey matin matte matzo mauls maund mauve maven mavis maxed maxes maxim maxis maybe mayor mayst mazer mazes meals mealy means meant meany meats meaty mecca medal media medic meets meiny melds melee melic melon melts memes memos mends menus meows mercy meres merge merit merle merry mesas mesic mesne meson messy metal meted meter metes meths metic metis metro mewed mewls mezzo micks micro middy midge midis midst miens miffs miffy might miked mikes mikva milch miler miles milfs milia milit milks milky mills milos milts mimed mimer mimes mimic mince minds mined miner mines mingy minim minis minke minks minor mints minty minus mired mires mirin mirth mirza misdo miser missy mists misty miter mites mitis mitts mixed mixer mixes mneme moans moats mocha mocks modal model modem modes moggy mogul mohur moils moire moist mokes molal molar molas molds moldy moles molls molly molts mommy monad monas monde money mongo monks monte month mooch moods moody mooed moons moony moors moose moots moped moper mopes mopey moral moray morel mores morns moron morph morse mosey mossy motel motes motet moths mothy motif motor motte motto moues mound mount mourn mouse mousy mouth moved mover moves movie mowed mower moxie mucin mucks mucky mucor mucro mucus muddy mudra muffs mufti muggy mujik mulch mulct mules muley mulla mulls multi mummy mumps munch mungs muons mural murex murks murky murre mused muser muses mushy music musky mussy musth musts musty muted muter mutes mutts muzak muzzy myall mycol mynas myrrh myths naans nabob nacho nacre nadir naevi naiad naifs nails naira naive naked naker nakfa named namer names nance nancy nanny napes nappe nappy narcs nards nares naris narky nasal nasty natal natch nates natty naval navar navel naves navig navvy nawab neaps nears neath necks needs needy negro negus neigh nelly neper neral nerds nerdy nerve nervy nests netty neume never nevus newel newer newly newsy newts nexus ngwee nicer niche nicks nidus niece niffy nifty nigga night nihil nimbi nimby nines ninja ninny ninon ninth nipas nippy nisei nisus niter nitid nitro nitty nival nixed nixes nobby noble nobly nocks nodal noddy nodes nodus noels nohow noise noisy nomad nomen nonce nones nonet nooks nooky noons noose noria norms north nosed noses notch noted notes notum nouns novae novas novel noway nubby nuder nudes nudge nuked nukes nulls numbs numen numis nurse nutty nyala nylon nymph oaken oakum oared oases oasis oasts oaten oaths obeah obeli obese obeys obits objet oboes oboli occas occur ocean ocher ocker ocrea octad octal octan octet oculi odder oddly odeon odeum odium odors offal offed offer often ogeed ogham ogive ogled ogler ogles ogres ohmic oiled oiler oinks okapi okays okras olden older oldie oleic olein oleum olive ollas ology omasa omber omega omens omits onion onset ontic oohed oomph ootid oozed oozes opahs opals opens opera opine oping opium opted optic orals orang orate orbit orcas order oread organ oriel orlop ornis orris osier osmic other ottar otter ought ounce ouphe ousel ousts outdo outed outer outgo outre outta ouzel ouzos ovals ovary ovate ovens overs overt ovine ovoid ovolo ovule owing owlet owned owner oxbow oxide oxime ozone paced pacer paces pacey pacha packs pacts paddy padre paean paeon pagan paged pager pages pails pains paint pairs paisa paled paleo paler pales palls pally palms palmy palsy pampa panda paned panel panes panga pangs panic panne pansy panto pants papal papas paper pappy paras parch pared parer pares pareu parka parks parky parol parrs parry parse parts party parve pasha pashm passe pasta paste pasts pasty patch paten pates paths patin patio patly patsy patty pause pavan paved paves pavid pavis pawed pawls pawns paxes payed payee payer peace peach peags peaks peaky peals peans pearl pears peart peaty pebas pecan pecks pedal peeks peels peens peeps peers peeve pekan pekes pekoe pelts penal pence pends penis penna penne penni penny peons peony peppy perch perdu peril peris perks perky perms perry perse pervs pesky pesos pesto pests pesty petal peter petit petty pewee pewit phage phase pheon phial phish phlox phone phons phony photo phots phren phyla phyle piano picks picky picot picul piece piers pieta piety piggy piing pikas piked piker pikes pilaf pilch piled pilei piles pills pilot pimps pinch pined pines piney pings pinko pinks pinna pinny pinon pinta pinto pints pinup pions pious piped piper pipes pipit pique pirog piste pitas pitch piths pithy piton pitta pivot pixel pixie pizza place plage plaid plain plait plane plank plans plant plash plasm plate plats platy playa plays plaza plead pleas pleat plebe plebs plena plica plied plier plies ploce plods plonk plops plots plows ploys pluck plugs plumb plume plump plums plumy plunk plush poach pocks pocky poddy poems poesy poets pogey pogge poilu point poise poked poker pokes pokey polar poled poler poles polio polis polit polka polls polyp polys pomes pommy ponce poncy ponds pones pongs pooch poods pooed poofs poohs pooka pools poons poops popes poppa poppy popup porch pored porer pores porgy porky porno ports posed poser poses posit posse posts potto potty pouch poufs poult pound pours pouts pouty power poxes prams prana prang prank prase prate prats prawn prays preen preps presa press prexy preys price prick pride pried prier pries prigs prime primo primp prink print prion prior prism privy prize probe prods proem profs prole promo prong proof propr props prose prosy proud prove prowl prows proxy prude prune psalm pseud pshaw psoas psych pubes pubic pubis pucka pucks pudgy puffs puffy puked pukes pukka pulas puled puler pules pulls pulps pulpy pulse pumas pumps punch pungs pungy punks punts pupae pupal pupil puppy puree purer purge purls purrs purse pursy pushy pussy putto putts putty pwned pygmy pylon pyoid pyres pyxes pyxie pzazz qibla qophs quack quads quaff quail quake quaky quale qualm quant quark quart quash quasi quass quays quean queen queer quell quern query quest queue quick quids quiet quiff quill quilt quine quins quint quips quipu quire quirk quirt quite quits quoin quoit quota quote quoth rabbi rabid raced racer races racks racon radar radii radio radix radon rafts ragas raged rages ragga ragis raids rails rains rainy raise rajah rajes raked raker rakes rales rally ramen ramie ramps rance ranch randy ranee range rangy ranks rants raped raper rapes rapid rared rarer rares rasps raspy ratal ratan rated ratel rater rates rathe ratio ratty raved ravel raven raver raves ravin rawer rayon razed razee razes razor reach react ready realm reals reams reaps rears reata reave rebec rebel rebid recap recce recon recti recto recur recut redan redly redye reedy reefs reeks reeky reels reest reeve refer refix refry regal regex rehab reify reign reive relax relay relic remex remit remix renal rends renew renin rents reorg repel repps repro resat resin resow rests retch retro revel revet revue rheas rheum rhino rhomb rhumb rhyme rials riant riata riced ricer rices ricks rider rides ridge ridgy riels rifer riffs rifle rifts right rigid rigor riled riles rille rills rimed rimes rinds rings rinks rinse riots ripen riper risen riser rises rishi risks risky rites ritzy rival rived riven river rives rivet riyal roach roads roams roans roars roast robed robes robin roble robot rocks rocky rodeo roger rogue roils roily roles rolls roman romeo romps ronde rondo roods roofs rooks rooky rooms roomy roose roost roots roped roper ropes roque roses rosin rotas rotls rotor roues rouge rough round rouse roust route routs roved rover roves rowan rowdy rowed rowel rower royal rubel rubes ruble ruche rucks rudds ruddy ruder ruffs rugby ruing ruins ruled ruler rules rumal rumba rumen rummy rumor rumps runes rungs runic runny runts runty rupee rural ruses rushy rusks rusts rusty ruths rutty saber sabin sable sabot sabra sacks sacra sades sadhu sadly safer safes sagas sager sages saggy sahib saiga sails saint saith saker sakes salad salep sales sally salmi salol salon salpa salsa salts salty salve salvo samba sambo sames samey sands sandy saner sapid sapor sappy saran sards sarge saris sarky saros sasin sassy satay sated satem sates satin satyr sauce saucy sauna saury saute saved saver saves savor savoy savvy sawed sawer saxes sayer scabs scads scags scald scale scalp scaly scamp scams scans scant scape scare scarf scarp scars scary scats scend scene scent schmo schwa scion scoff scold scone scoop scoot scope score scorn scour scout scowl scows scrag scram scrap scree screw scrim scrip scrod scrog scrub scrum scuba scudo scuds scuff scull sculp scums scups scurf scuta scute scuts seals seams seamy sears seats sebum secco sects sedan sedge sedgy sedum seeds seedy seeks seels seems seeps seers segno segue seine seise seism seize selah sells semen semis sends senna senor sense sente sepal sepia sepoy septa septs serai serer serfs serge serif serin serow serum serve servo setae setts setup seven sever sewan sewed sewer sexed sexes sexts shack shade shads shady shaft shags shahs shake shako shaky shale shall shalt shame shams shank shape shard share shark sharp shave shawl shawm shays sheaf shear sheds sheen sheep sheer sheet shelf shell shend shewn shews shied shier shies shift shill shims shine shins shiny ships shire shirk shirr shirt shits shiva shive shivs shoal shoat shock shoes shone shook shool shoos shoot shops shore short shote shots shout shove shown shows showy shred shrew shrub shrug shuck shuns shunt shush shuts shyer shyly sibyl sicko sicks sided sides sidle siege sieve sifts sighs sight sigil sigma signs sikas silds silks silky sills silly silos silts silty silva simar simba since sines sinew singe sings sinks sinus sired siren sires sisal sises sissy sitar sited sites situs sixes sixth sixty sizar sized sizer sizes skald skate skean skeet skegs skein skelp skeps skews skids skied skier skies skiff skill skimp skims skink skins skint skips skirl skirr skirt skite skits skive skoal skosh skuas skulk skull skunk slabs slack slags slain slake slams slang slant slaps slash slate slats slaty slave slays sleds sleek sleep sleet slept slews slice slick slide slier slime slims slimy sling slink slips slits slobs sloes slogs sloop slope slops slosh sloth slots slows slubs slued slues sluff slugs slump slums slung slunk slurp slurs slush sluts slyly slype smack small smalt smarm smart smash smaze smear smell smelt smews smile smirk smite smith smock smogs smoke smoko smoky smolt smote smurf smuts snack snafu snags snail snake snaky snaps snare snarf snark snarl snath sneak sneck sneer snick snide sniff snipe snips snits snobs snogs snood snook snoop snoot snore snort snots snout snows snowy snubs snuff snugs soaks soaps soapy soars soave sober socks socle sodas sofar sofas softa softy soggy soils solan solar soldo soled soles solid solon solos solus solve somas sonar sonde sones songs sonic sonly sonny sooth sooty sopor soppy sorbs sorer sores sorgo sorry sorta sorts sorus sough souks souls sound soups soupy sours souse south sowed sower space spade spahi spake spall spams spang spank spans spare spark spars spasm spate spats spawn spays speak spear speck specs speed spell spend spent speos sperm spews spica spice spics spicy spied spiel spier spies spiff spike spiky spile spill spine spins spiny spire spiry spite spits spitz spivs splat splay split spoil spoke spoof spook spool spoon spoor spore sport spots spout sprag sprat spray spree sprig sprit sprog sprue spuds spued spues spume spumy spunk spurn spurs spurt sputa squab squad squat squaw squib squid sruti stabs stacc stack staff stage stags stagy staid stain stair stake stale stalk stall stamp stand stane stang stank staph stare stark stars start stash state stats stave stays stdio stead steak steal steam steed steel steep steer stein stela stele stems steno stent steps stere stern stets stews stich stick sties stiff stile still stilt sting stink stint stipe stirk stirs stoat stock stoic stoke stole stoma stomp stone stony stood stook stool stoop stope stops store stork storm story stoss stoup stout stove stows strap straw stray strep strew stria strip strop strow stroy strum strut stubs stuck studs study stuff stull stump stung stunk stuns stunt stupa stupe style styli suave sucks sucre sudor sudsy suede suety sugar suing suint suite suits sulci sulfa sulks sulky sully sumac summa sumps sunny sunup super suppl supra surah sural suras surds surer surfs surge surgy surly surra sushi sutra swabs swage swags swain swale swami swamp swank swans swaps sward swarm swart swash swath swats sways swear sweat swede sweep sweet swell swept swift swigs swill swims swine swing swink swipe swirl swish swizz swoon swoop sword swore sworn swots swung sycee sylph syncs synod synop synth syrup sysop tabby tabes tabla table taboo tabor tacet tache tacit tacks tacky tacos taffy tafia taiga tails taint takas taken taker takes takin talas taler tales talks talky tally talon taluk talus tamed tamer tames tamis tammy tamps tango tangs tangy tanka tanks tansy tanto tapas taped taper tapes tapir tapis tardy tared tares targe tarns taros tarot tarps tarry tarsi tarts tarty taser tasks tasse taste tasty tater tatty taunt taupe tawny taxed taxer taxes taxis taxon tayra tazza teach teaks teals teams tears teary tease teats techs techy teddy teems teens teeny teeth teleg telex telic tells telly tempo temps tempt tench tends tenet tenge tenia tenne tenno tenon tenor tense tenth tents tepee tepid terce terms terns terra terry terse tesla testa tests testy teths tetra texts thane thank thaws thebe theca thees theft thegn their theme theol there therm these theta thews thewy thick thief thigh thill thine thing think thins thiol third thole thong thorn thorp those thous three threw throb throe throw thrum thuds thugs thuja thumb thump thunk thuya thyme tiara tibia tical ticks tidal tided tides tiers tiffs tiger tight tigon tilde tiled tiler tiles tills tilth tilts timed timer times timid tinct tinea tined tines tinge tings tinny tints tipsy tired tires titan titch titer tithe titis title titty tizzy toads toady toast today toddy toeas toffs togas toile toils tokay toked token tokes tolan tolar tolls tolly tolus tolyl tombs tomes tonal toned toner tones tonga tongs tonic tonne tonus tools tooth toots topaz toped topee toper topes topic topog toque torch torii torrs torse torsk torso torte torts torus total toted totem toter totes touch tough tours touts towed towel tower towns toxic toxin toyed trace track tract trade trail train trait tramp trams trans traps trash trass trave trawl trays tread treas treat treed treen trees treks trend tress trews treys triad trial tribe trice trick tried trier tries trike trill trims trine trios tripe trips trite troat troll tromp trona trons troop trope troth trots trout trove trows troys truce truck trued truer trues trugs trull truly trump trunk truss trust truth tryma tryst tubal tubas tubby tubed tuber tubes tucks tufts tufty tulip tulle tumid tummy tumor tunas tuned tuner tunes tunic tunny tuple tuque turbo turds turfs turfy turns turps tushy tusks tutor tutti tutty tutus tuxes twain twang twats tweak tweed tween tweet twerk twerp twice twigs twill twine twink twins twirl twist twits twixt tying tykes typal typed types typos tyros udder uhlan ukase ulcer ulema ulnae ulnar ultra umbel umber umbra umiak umped unapt unary unbid unbox uncap uncle uncut undue unfed unfit unify union unite unity unjam unlay unlit unmet unpeg unpen unpin unrig unsay unset until unwed unwon upend upped upper upset urban uredo urged urger urges urial urine usage users usher using usual usurp usury uteri utile utter uveas uvula vagal vague vagus vales valet valid valor valse value valve vamps vampy vanda vanes vaped vapes vapid vapor varas varia varix varus varve vases vasts vasty vatic vault vaunt vedic veeps veers veery vegan veges veils veins veiny velar velds velum venae venal vends venge venin venom vents venue verbs verge versa verse verso verst vertu verve vesta vests vetch veter vexed vexes vials viand vibes vicar viced vices video views viewy vigil vigor viler villa villi vimen vines vinic vinyl viola viols viper viral vireo virga virtu virus visas vised vises visit visor vista vitae vital vitta vivas vivid vixen vocab vocal vodka vogue voice voids voila voile volar voles volts volva vomer vomit voted voter votes vouch vouge vowed vowel vower vulva vying wacke wacko wacks wacky waded wader wades wadge wadis wafer wafts waged wager wages wagon wahoo waifs wails wains waist waits waive waked waken wakes waldo waled wales walks walls wally waltz wands waned wanes wanks wanly wanna wants wards wares warez warms warns warps warts warty washy wasps waste watch water watts waved waver waves waxed waxen waxes wazoo weald weals weans wears weary weave webby weber wedge weeds weedy weeks weens weeny weeps weepy weest wefts weigh weird weirs wekas welds wells welly welsh welts wench wends wersh wetly whack whale whams whaps wharf whats wheal wheat wheel wheen whelk whelm whelp whens where whets which whiff while whims whine whins whiny whips whipt whirl whirs whish whisk whist white whits whity whole whomp whoop whops whore whorl whose whoso whsle whups wicks widen wider wides widow width wield wight wikis wilds wiled wiles wills willy wilts wimps wimpy wince winch winds windy wined wines wings winks winos winze wiped wiper wipes wired wirer wires wirra wised wiser wises wisps wispy witch withe withy witty wived wives wizen woald wodge woken wolds wolfs woman wombs women wonks wonky woods woody wooed wooer woofs wools woops woozy words wordy works world worms wormy worry worse worst worth would wound woven wowed wrack wraps wrath wreak wreck wrens wrest wring wrist write writs wrong wrote wroth wrung wryer wryly wurst wussy xcvii xebec xenia xenon xeric xerox xrefs xterm xviii xxiii xxvii xxxii xxxiv xxxix xxxvi xylem xylol yacht yahoo yakka yamen yanks yapok yapon yappy yards yarns yawed yawls yawns yawps yeahs yeans yearn years yeast yeggs yells yelps yenta yeses yetis yield yikes yobbo yodel yodle yogic yogis yoked yokel yokes yolks yonks young yours youth yowls yucca yucky yukky yulan yummy yurts zaire zamia zappy zarfs zayin zazen zebec zebra zebus zeros zests zesty zetas zibet zilch zincs zines zings zingy zippy zitis zloty zonal zoned zones zooid zooms zorch zoril';
@@ -1409,16 +1429,20 @@ function rprep(name) { const t = rtok(name), c = t.join(''); return { t, c, k: c
 const RARE_P = RARE.map(cat => {
   const items = cat.a.split('|').map(x => x.trim()).filter(Boolean);
   const n = items.length;
-  return {
-    s: cat.s, q: cat.q,
-    ans: items.map((x, r) => {
-      let tier = 0; const m = x.match(/:(\d)\s*$/);
-      if (m) { tier = +m[1]; x = x.slice(0, m.index); }
-      if (!tier) { const p = r / n; tier = p < 0.05 ? 1 : p < 0.15 ? 2 : p < 0.35 ? 3 : p < 0.7 ? 4 : 5; }
-      const names = x.split('/').map(t => t.trim()).filter(Boolean);
-      return { name: names[0], tier, keys: names.map(rprep).filter(k => k.c) };
-    }).filter(a => a.keys.length)
-  };
+  const ans = items.map((x, r) => {
+    let tier = 0; const m = x.match(/:(\d)\s*$/);
+    if (m) { tier = +m[1]; x = x.slice(0, m.index); }
+    /* Wide bands: the most common 10% are Plankton, then Schooler to 25%,
+       Rare to 50%, and everything rarer is a Deep Cut. One in a Krillion is
+       never positional: each category marks exactly one answer with :5. */
+    if (!tier) { const p = r / n; tier = p < 0.10 ? 1 : p < 0.25 ? 2 : p < 0.50 ? 3 : 4; }
+    const names = x.split('/').map(t => t.trim()).filter(Boolean);
+    return { name: names[0], tier, keys: names.map(rprep).filter(k => k.c) };
+  }).filter(a => a.keys.length);
+  const top = ans.filter(a => a.tier === 5);
+  top.slice(1).forEach(a => { a.tier = 4; });
+  if (!top.length && ans.length) ans[ans.length - 1].tier = 5;
+  return { s: cat.s, q: cat.q, ans };
 });
 function seqIn(t, k) {
   for (let s = 0; s + k.length <= t.length; s++) if (k.every((w, j) => t[s + j] === w)) return true;
@@ -1506,75 +1530,249 @@ const SYM_ASCII = { ok: '+', near: '?', miss: '-' };
 /* ============================================================ */
 const GAMES = {};
 
-/* ---------- 1. Typing drill ---------- */
+/* ---------- 1. Typing test (Monkeytype-style) ---------- */
+/* A flowing stream of words: lowercase with no punctuation unless turned on.
+   Modes: time (type until the clock runs out), words (a fixed count) and
+   quote (one whole passage). The clock starts with the first keystroke.
+   Typing is word-based: Space moves to the next word, extra letters show
+   as errors, and Backspace can step back into an earlier word only if it
+   has a mistake. */
+const TY_TIMES = [15, 30, 60, 120], TY_COUNTS = [10, 25, 50, 100];
+const TY_LIMITS = { time: [5, 600], words: [1, 1000] };
+const TY_DEFAULT = { mode: 'time', time: 30, words: 25, punct: false, nums: false, src: 'prose' };
+const TY_COMMON = ('the be of and a to in he have it that for they with as not on she at by this we you do but from or which one would all will ' +
+  'there say who make when can more if no man out other so what time up go about than into could state only new year some take come these know ' +
+  'see use get like then first any work now may such give over think most even find day also after way many must look before great back through ' +
+  'long where much should well people down own just because good each those feel seem how high too place little world very still nation hand old ' +
+  'life tell write become here show house both between need mean call develop under last right move thing general school never same another ' +
+  'begin while number part turn real leave might want point form off child few small since against ask late home interest large person end ' +
+  'open public follow during present without again hold around possible head consider word program problem however lead system set order eye ' +
+  'plan run keep face fact group play stand increase early course change help line').split(' ');
+const tyNow = () => performance.now();
+const tyLabel = c => c.mode === 'time' ? `time ${c.time}` : c.mode === 'words' ? `words ${c.words}` : 'quote';
+const tyFull = c => tyLabel(c) + (c.punct ? ' + punctuation' : '') + (c.nums ? ' + numbers' : '');
 GAMES.typing = {
-  id: 'typing', name: 'Monkeytype', inspo: 'Typing speed and accuracy test',
-  blurb: 'Retype a passage exactly. Speed and accuracy are measured as you go.',
-  menu: [{ id: 'next', label: 'Next passage' }],
-  init(m) { const s = { round: 1, hist: [], best: 0 }; this.load(s, m); return s; },
-  pool(m) { return TYPING[m === 'script' ? 'script' : m === 'sheet' ? 'sheet' : 'doc'].passages; },
-  load(s, m) {
-    const pool = this.pool(m); s.src = m;
-    const p = pool[bagNext(s, 'bag_' + m, pool.length)];
-    s.text = typeof p === 'string' ? p : p.text; s.who = p.who || null; s.paren = p.paren || null;
-    s.typed = ''; s.keys = 0; s.errs = 0; s.ms = 0; s.done = false;
+  id: 'typing', name: 'Monkeytype', inspo: 'Typing test with time and word modes',
+  blurb: 'Type a flowing stream of lowercase words. Choose time or words mode, set the length, and turn on punctuation or numbers if you want them.',
+  menu(s) {
+    const c = (s && s.cfg) || TY_DEFAULT, is = v => c.mode === v;
+    return [
+      { id: 'next', label: 'Restart with new text', sc: 'Tab' },
+      { label: 'Test mode', sub: [['time', 'Time'], ['words', 'Words'], ['quote', 'Quote (one passage)']].map(([v, l]) => ({ id: 'set:mode:' + v, label: l, checked: is(v) })) },
+      { label: 'Time limit', sub: TY_TIMES.map(t => ({ id: 'set:time:' + t, label: t + ' seconds', checked: is('time') && c.time === t })).concat({ id: 'custom:time', label: 'Custom…', checked: is('time') && !TY_TIMES.includes(c.time) }) },
+      { label: 'Word count', sub: TY_COUNTS.map(n => ({ id: 'set:words:' + n, label: n + ' words', checked: is('words') && c.words === n })).concat({ id: 'custom:words', label: 'Custom…', checked: is('words') && !TY_COUNTS.includes(c.words) }) },
+      { id: 'set:punct', label: 'Punctuation and capitals', checked: c.punct },
+      { id: 'set:nums', label: 'Numbers', checked: c.nums },
+      { label: 'Words from', sub: [{ id: 'set:src:prose', label: 'The document (prose)', checked: c.src !== 'common' }, { id: 'set:src:common', label: 'Common English words', checked: c.src === 'common' }] }
+    ];
   },
-  running(s) { return s.typed.length > 0 && !s.done; },
+  init(m) { const s = { round: 1, hist: [], best: 0, pbs: {}, cfg: Object.assign({}, TY_DEFAULT) }; this.load(s, m); return s; },
+  pool(m) { return TYPING[m === 'script' ? 'script' : m === 'sheet' ? 'sheet' : 'doc'].passages; },
+  /* upgrades saves from the older passage-only version */
+  fix(s, m) {
+    if (!s.cfg) s.cfg = Object.assign({}, TY_DEFAULT);
+    if (!s.pbs) s.pbs = {};
+    if (!Array.isArray(s.hist)) s.hist = [];
+    if (!Array.isArray(s.words) || !Array.isArray(s.typedW) || !s.words.length) { delete s.text; delete s.typed; this.load(s, m || s.src || 'doc'); }
+  },
+  load(s, m) {
+    Object.assign(s, { src: m, words: [], typedW: [], cur: 0, curIn: '', keys: 0, errs: 0, ms: 0, done: false, started: false, who: null, paren: null, firstAt: null, tickAt: null });
+    this.fill(s, m);
+  },
+  restart(s, m) { if (s.done) s.round++; this.load(s, m); },
+  num() { const d = 1 + Math.floor(Math.random() * 4); let n = String(1 + Math.floor(Math.random() * 9)); while (n.length < d) n += Math.floor(Math.random() * 10); return n; },
+  tokens(text, c) {
+    const w = c.punct ? text.split(/\s+/) : text.split(/[\s–—-]+/).map(x => x.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    return w.filter(Boolean).map(x => c.nums && Math.random() < 0.1 ? this.num() : x);
+  },
+  addPassage(s, m) {
+    const pool = this.pool(m), p = pool[bagNext(s, 'bag_' + m, pool.length)];
+    if (!s.words.length && p.who) { s.who = p.who; s.paren = p.paren || null; }
+    s.words.push(...this.tokens(typeof p === 'string' ? p : p.text, s.cfg));
+  },
+  addCommon(s, n) {
+    const c = s.cfg; let prev = s.words[s.words.length - 1] || '', cap = !prev || /[.?!]$/.test(prev);
+    for (let i = 0; i < n; i++) {
+      let w; do { w = TY_COMMON[Math.floor(Math.random() * TY_COMMON.length)]; } while (w === prev.toLowerCase().replace(/[^a-z]/g, ''));
+      if (c.nums && Math.random() < 0.1) w = this.num();
+      if (c.punct) {
+        if (cap && /^[a-z]/.test(w)) w = w[0].toUpperCase() + w.slice(1);
+        const r = Math.random(); cap = false;
+        if (r < 0.07) { w += '.'; cap = true; } else if (r < 0.09) { w += '?'; cap = true; } else if (r < 0.18) w += ',';
+      }
+      s.words.push(w); prev = w;
+    }
+  },
+  fill(s, m) {
+    const c = s.cfg;
+    if (c.mode === 'quote') { if (!s.words.length) this.addPassage(s, m); return; }
+    const need = c.mode === 'words' ? c.words : s.cur + 80;
+    for (let g = 0; s.words.length < need && g < 200; g++) { if (c.src === 'common') this.addCommon(s, 40); else this.addPassage(s, m); }
+    if (c.mode === 'words') {
+      if (s.words.length > c.words) s.words.length = c.words;
+      const L = s.words.length - 1;
+      if (c.punct && c.src === 'common' && L >= 0 && !/[.?!]$/.test(s.words[L])) s.words[L] = s.words[L].replace(/,$/, '') + '.';
+    }
+  },
+  start(s) { if (!s.started) Object.assign(s, { started: true, ms: 0, firstAt: tyNow(), tickAt: null }); },
+  running(s) { return !!s.started && !s.done; },
+  clockMs(s) { const c = s.cfg || TY_DEFAULT; return c.mode === 'time' ? Math.max(0, c.time * 1000 - (s.ms || 0)) : (s.ms || 0); },
+  tick(s, dt) {
+    const now = tyNow();
+    /* drop the slice of the first tick that came before the first keystroke */
+    if (s.firstAt != null) { const pre = s.firstAt - (now - dt); if (pre > 0 && pre <= dt) s.ms = Math.max(0, s.ms - pre); s.firstAt = null; }
+    s.tickAt = now;
+    if (s.cfg.mode === 'time' && s.ms >= s.cfg.time * 1000) { s.ms = s.cfg.time * 1000; this.finish(s, true); return true; }
+    return false;
+  },
   key(s, k, m) {
-    if (k.key === 'Enter') { if (s.done) { s.round++; this.load(s, m); return true; } return false; }
+    this.fix(s, m);
+    if (k.key === 'Tab') { this.restart(s, m); return true; }
+    if (k.key === 'Enter') { if (s.done && !k.repeat) { this.restart(s, m); return true; } return false; }
     if (s.done) return false;
+    const w = s.words[s.cur];
     if (k.key === 'Backspace') {
-      if (k.ctrl || k.alt) s.typed = s.typed.replace(/\S*\s*$/, ''); else s.typed = s.typed.slice(0, -1);
+      const all = k.ctrl || k.alt;
+      if (s.curIn) s.curIn = all ? '' : s.curIn.slice(0, -1);
+      else if (s.cur > 0 && s.typedW[s.cur - 1] !== s.words[s.cur - 1]) { s.cur--; s.curIn = all ? '' : s.typedW[s.cur]; s.typedW.length = s.cur; }
+      return true;
+    }
+    if (k.key === ' ' || k.ch === ' ') {
+      if (!s.curIn) return true;
+      s.keys++; if (s.curIn.length < w.length) s.errs++;
+      s.typedW[s.cur] = s.curIn; s.cur++; s.curIn = '';
+      if (s.cfg.mode === 'time') { if (s.words.length - s.cur < 40) this.fill(s, m); }
+      else if (s.cur >= s.words.length) this.finish(s);
       return true;
     }
     if (k.ch) {
-      const i = s.typed.length; s.typed += k.ch; s.keys++;
-      if (k.ch !== s.text[i]) s.errs++;
-      if (s.typed.length >= s.text.length) this.finish(s);
+      if (s.curIn.length >= w.length + 12) return true;
+      this.start(s);
+      s.keys++; if (!(s.curIn.length < w.length && k.ch === w[s.curIn.length])) s.errs++;
+      s.curIn += k.ch;
+      if (s.cfg.mode !== 'time' && s.cur === s.words.length - 1 && s.curIn === w) { s.typedW[s.cur] = s.curIn; this.finish(s); }
       return true;
     }
     return false;
   },
-  act(s, a, m) { if (a === 'next') { s.round++; this.load(s, m); return true; } return false; },
-  correct(s) { let c = 0; for (let i = 0; i < s.typed.length; i++) if (s.typed[i] === s.text[i]) c++; return c; },
-  wpm(s) { return s.ms > 1500 ? Math.round(this.correct(s) / 5 / (s.ms / 60000)) : 0; },
-  acc(s) { return s.keys ? Math.max(0, Math.round(100 * (s.keys - s.errs) / s.keys)) : 100; },
-  finish(s) {
+  act(s, a, m) {
+    this.fix(s, m);
+    if (a === 'next') { this.restart(s, m); return true; }
+    if (!a.startsWith('set:')) return false;
+    const [, k, v] = a.split(':'), c = s.cfg, n = parseInt(v, 10);
+    if (k === 'mode' && (v === 'time' || v === 'words' || v === 'quote')) c.mode = v;
+    else if ((k === 'time' || k === 'words') && n >= TY_LIMITS[k][0] && n <= TY_LIMITS[k][1]) { c[k] = n; c.mode = k; }
+    else if (k === 'punct') c.punct = !c.punct;
+    else if (k === 'nums') c.nums = !c.nums;
+    else if (k === 'src' && (v === 'prose' || v === 'common')) c.src = v;
+    else return false;
+    this.restart(s, m);
+    return true;
+  },
+  /* asks the workspace for a number (custom time or word count) */
+  custom(s, kind) {
+    this.fix(s);
+    if (kind === 'time') return { title: 'Custom time limit', label: 'Seconds', value: s.cfg.time, min: TY_LIMITS.time[0], max: TY_LIMITS.time[1], act: 'set:time:' };
+    if (kind === 'words') return { title: 'Custom word count', label: 'Words', value: s.cfg.words, min: TY_LIMITS.words[0], max: TY_LIMITS.words[1], act: 'set:words:' };
+    return null;
+  },
+  stats(s) {
+    let corr = 0, inc = 0, extra = 0, miss = 0, good = 0;
+    const last = Math.min(s.cur, s.words.length - 1);
+    for (let i = 0; i <= last; i++) {
+      const w = s.words[i], open = i === s.cur, t = open ? s.curIn : (s.typedW[i] || '');
+      for (let j = 0; j < Math.max(w.length, t.length); j++) {
+        if (j >= w.length) extra++;
+        else if (j >= t.length) { if (!open) miss++; }
+        else if (t[j] === w[j]) corr++; else inc++;
+      }
+      if (open) { if (t && w.startsWith(t)) good += t.length; }
+      else if (t === w) good += w.length + (i < s.words.length - 1 ? 1 : 0);
+    }
+    const min = s.ms / 60000, ok = s.ms >= 1000 || (s.done && s.ms > 0);
+    return {
+      corr, inc, extra, miss,
+      wpm: ok ? Math.round(good / 5 / min) : 0,
+      raw: ok ? Math.round(s.keys / 5 / min) : 0,
+      acc: s.keys ? Math.max(0, Math.round(100 * (s.keys - s.errs) / s.keys)) : 100
+    };
+  },
+  finish(s, timedOut) {
+    if (!timedOut) {
+      const now = tyNow();
+      if (s.firstAt != null && now >= s.firstAt && now - s.firstAt < 2000) s.ms = now - s.firstAt;
+      else if (s.tickAt != null && now >= s.tickAt && now - s.tickAt < 400) s.ms += now - s.tickAt;
+    }
+    s.firstAt = s.tickAt = null;
     s.done = true;
-    const r = { n: s.round, wpm: this.wpm(s), acc: this.acc(s), ms: s.ms };
-    s.hist.push(r); if (s.hist.length > 30) s.hist.shift();
-    const isBest = r.wpm > s.best; s.best = Math.max(s.best, r.wpm);
-    s.lastNote = { text: `Pass ${r.n}: ${r.wpm} wpm, ${r.acc}% accuracy${isBest ? ' (your best so far)' : ''}. Press Enter for the next passage.`, tone: 'ok' };
-    flash(s, `Pass ${r.n} done: ${r.wpm} wpm, ${r.acc}%`, 'ok');
+    const st = this.stats(s), label = tyFull(s.cfg), prev = s.pbs[label] || 0, pb = st.wpm > prev;
+    if (pb) s.pbs[label] = st.wpm;
+    s.best = Math.max(s.best || 0, st.wpm);
+    s.hist.push({ n: s.round, mode: label, wpm: st.wpm, raw: st.raw, acc: st.acc, ms: s.ms }); if (s.hist.length > 30) s.hist.shift();
+    s.lastNote = { text: `Test ${s.round} (${label}): ${st.wpm} wpm, ${st.acc}% accuracy, raw ${st.raw}. Characters: ${st.corr} correct, ${st.inc} wrong, ${st.extra} extra, ${st.miss} missed.` +
+      (pb ? ` New best for ${label}!` : ` Best for ${label}: ${prev} wpm.`) + ' Press Enter or Tab for the next test.', tone: 'ok' };
+    flash(s, `${st.wpm} wpm · ${st.acc}% accuracy · ${label}`, 'ok');
   },
   runs(s) {
-    const out = [], t = s.text, ty = s.typed; let cur = null;
-    const push = (ch, c) => { if (cur && cur.c === c) cur.text += ch; else { cur = { text: ch, c }; out.push(cur); } };
-    for (let i = 0; i < t.length; i++) {
-      if (i === ty.length && !s.done) { out.push({ caret: true }); cur = null; }
-      if (i < ty.length) push(t[i], ty[i] === t[i] ? '' : (t[i] === ' ' ? 'err sp' : 'err'));
-      else push(t[i], 'ghost');
-    }
+    const out = []; let cur = null;
+    const push = (text, c) => { if (cur && cur.c === c) cur.text += text; else { cur = { text, c }; out.push(cur); } };
+    const caret = () => { out.push({ caret: true }); cur = null; };
+    s.words.forEach((w, i) => {
+      if (i) push(' ', i <= s.cur ? '' : 'ghost');
+      if (i > s.cur) { push(w, 'ghost'); return; }
+      const open = i === s.cur, t = open ? s.curIn : (s.typedW[i] || '');
+      for (let j = 0; j < w.length; j++) {
+        if (open && j === t.length && !s.done) caret();
+        if (j < t.length) push(w[j], t[j] === w[j] ? '' : 'err');
+        else push(w[j], open ? 'ghost' : 'err miss');
+      }
+      if (t.length > w.length) push(t.slice(w.length), 'err extra');
+      if (open && t.length >= w.length && !s.done) caret();
+    });
     return out;
   },
+  cfgRuns(s) {
+    const c = s.cfg, R = [];
+    const opt = (text, act, on) => R.push({ text, act, c: on ? 'opt on' : 'opt' });
+    const gap = t => R.push({ text: t, c: 'dim' });
+    gap('Test settings: ');
+    [['time', 'time'], ['words', 'words'], ['quote', 'quote']].forEach(([v, l], i) => { if (i) gap(' '); opt(l, 'set:mode:' + v, c.mode === v); });
+    if (c.mode !== 'quote') {
+      gap(' | ');
+      const list = c.mode === 'time' ? TY_TIMES : TY_COUNTS, val = c[c.mode];
+      list.forEach((v, i) => { if (i) gap(' '); opt(String(v), `set:${c.mode}:${v}`, v === val); });
+      gap(' '); opt(list.includes(val) ? 'custom' : `custom (${val})`, 'custom:' + c.mode, !list.includes(val));
+    }
+    gap(' | '); opt('punctuation', 'set:punct', c.punct); gap(' '); opt('numbers', 'set:nums', c.nums);
+    if (c.mode !== 'quote') { gap(' | '); opt('prose', 'set:src:prose', c.src !== 'common'); gap(' '); opt('common words', 'set:src:common', c.src === 'common'); }
+    return R;
+  },
   status(s) {
-    const live = s.done ? s.hist[s.hist.length - 1] : null;
+    this.fix(s);
+    const c = s.cfg, st = this.stats(s), last = s.done ? s.hist[s.hist.length - 1] : null, timed = c.mode === 'time';
+    const t = timed ? Math.ceil(this.clockMs(s) / 1000) * 1000 : this.clockMs(s);
     return [
-      { k: 'score', v: (live ? live.wpm : this.wpm(s)) + ' wpm' },
-      { k: 'acc', v: (live ? live.acc : this.acc(s)) + '% accuracy' },
-      { k: 'round', v: 'Pass ' + s.round },
-      { k: 'time', v: clock(s.ms), ms: s.ms }
+      { k: 'score', v: (last ? last.wpm : st.wpm) + ' wpm' },
+      { k: 'acc', v: (last ? last.acc : st.acc) + '% accuracy' },
+      { k: 'round', v: timed ? tyLabel(c) : `${Math.min(s.done ? s.words.length : s.cur, s.words.length)}/${s.words.length} words` },
+      { k: 'time', v: clock(t), ms: t, force: timed, warn: timed && s.started && !s.done && t <= 5000 }
     ];
   },
-  histRows(s) { return s.hist.slice(-6).map(h => [String(h.n), h.wpm + ' wpm', h.acc + '%', clock(h.ms)]); },
+  histRows(s) { return s.hist.slice(-6).map(h => [String(h.n), h.mode || '—', h.wpm + ' wpm', h.acc + '%', clock(h.ms)]); },
   replies(s) {
     if (s.done && s.lastNote) return [s.lastNote];
     const h = s.hist[s.hist.length - 1];
-    return h ? [{ text: `Last pass: ${h.wpm} wpm, ${h.acc}% accuracy. Best: ${s.best} wpm.` }] : [];
+    return h ? [{ text: `Last test: ${h.wpm} wpm, ${h.acc}% accuracy${h.mode ? ` (${h.mode})` : ''}. Best overall: ${s.best} wpm.` }] : [];
   },
   view(s, m) {
-    const runs = this.runs(s), replies = this.replies(s), hist = this.histRows(s);
-    const histRows = hist.length ? hist : [[{ v: '—', c: 'dim' }, '', '', '']];
+    this.fix(s, m);
+    const c = s.cfg, runs = this.runs(s), cfg = this.cfgRuns(s), replies = this.replies(s), hist = this.histRows(s);
+    const histRows = hist.length ? hist : [[{ v: '—', c: 'dim' }, '', '', '', '']];
+    const sub = `Test ${s.round} · ${tyFull(c)}`;
+    const task = c.mode === 'time' ? `Type as much as you can in ${c.time} seconds.` : c.mode === 'words' ? `Type these ${s.words.length} words.` : 'Retype this whole passage.';
+    const how = ' The clock starts with your first keystroke. Space moves to the next word, red marks a slip, and Backspace fixes it.';
+    const foot = 'Tab restarts with new text · settings sit just above the text';
+    const actions = [{ label: s.done ? 'Next test' : 'Restart', act: 'next' }];
     if (m === 'script') {
       const C = TYPING.script;
       return {
@@ -1583,27 +1781,29 @@ GAMES.typing = {
           { t: 'h', text: C.scene },
           { t: 'p', text: C.action },
           { t: 'say', who: C.lead.who, text: C.lead.text },
+          { t: 'p', id: 'cfg', c: 'cfg', runs: cfg },
           { t: 'say', id: 'pass', who: s.who || 'NORA', paren: s.paren, runs, wt: 'input' },
-          { t: 'note', anchor: 'pass', author: 'Table read', sub: 'Pass ' + s.round, text: 'Run this speech exactly as written. Grey words are still to go; red marks a slip, and Backspace fixes it.', replies, wt: 'prompt' },
+          { t: 'note', anchor: 'pass', author: 'Table read', sub, text: task + how, foot, replies, actions, wt: 'prompt' },
           { t: 'p', text: C.log },
-          { t: 'table', id: 'hist', caption: "STAGE MANAGER'S LOG", cols: ['RUN', 'SPEED', 'ACCURACY', 'TIME'], rows: histRows, wt: 'feedback' }
+          { t: 'table', id: 'hist', caption: "STAGE MANAGER'S LOG", cols: ['RUN', 'MODE', 'SPEED', 'ACCURACY', 'TIME'], rows: histRows, wt: 'feedback' }
         ]
       };
     }
     if (m === 'sheet') {
       const C = TYPING.sheet;
       return {
-        title: C.docTitle, sheetName: 'Notes', sheetCols: [110, 230, 80, 110, 120], formula: s.typed, status: this.status(s),
+        title: C.docTitle, sheetName: 'Notes', sheetCols: [110, 230, 120, 110, 120], formula: s.curIn, status: this.status(s),
         blocks: [
           { t: 'title', text: C.title },
           { t: 'meta', text: C.meta },
           { t: 'table', id: 'items', cols: ['Owner', 'Action item', 'Due', 'Status'], rows: C.items },
           { t: 'gap' },
           { t: 'h', text: 'Discussion notes (clean copy)' },
+          { t: 'p', id: 'cfg', c: 'cfg', runs: cfg },
           { t: 'p', id: 'pass', runs, wt: 'input', tall: true },
-          { t: 'note', anchor: 'pass', author: 'Secretary', sub: 'Pass ' + s.round, text: 'Please retype these notes into the clean copy, exactly as written. Grey text is still to go; red marks a slip.', replies, wt: 'prompt' },
+          { t: 'note', anchor: 'pass', author: 'Secretary', sub, text: task + how, foot, replies, actions, wt: 'prompt' },
           { t: 'gap' },
-          { t: 'table', id: 'hist', cols: ['Pass', 'Speed', 'Accuracy', 'Time'], rows: histRows, wt: 'feedback' }
+          { t: 'table', id: 'hist', cols: ['Pass', 'Mode', 'Speed', 'Accuracy', 'Time'], rows: histRows, wt: 'feedback' }
         ]
       };
     }
@@ -1614,37 +1814,45 @@ GAMES.typing = {
         { t: 'meta', text: C.meta },
         { t: 'title', text: C.essayTitle },
         ...C.context.map(text => ({ t: 'p', text })),
+        { t: 'p', id: 'cfg', c: 'cfg', runs: cfg },
         { t: 'p', id: 'pass', runs, wt: 'input' },
-        { t: 'note', anchor: 'pass', author: 'Peer reviewer', sub: 'Pass ' + s.round, text: 'Clean copy needed: retype this paragraph so it matches exactly. Grey text is still to go; a red squiggle marks a slip, and Backspace fixes it.', replies, wt: 'prompt' },
+        { t: 'note', anchor: 'pass', author: 'Peer reviewer', sub, text: 'Clean copy needed. ' + task + how, foot, replies, actions, wt: 'prompt' },
         { t: 'h', text: 'Revision history' },
-        { t: 'table', id: 'hist', cols: ['Pass', 'Speed', 'Accuracy', 'Time'], rows: histRows, wt: 'feedback' }
+        { t: 'table', id: 'hist', cols: ['Pass', 'Mode', 'Speed', 'Accuracy', 'Time'], rows: histRows, wt: 'feedback' }
       ]
     };
   },
   walk: {
-    doc: ['The comment beside the paragraph is your task: retype the grey paragraph exactly.', 'Just start typing. Text turns black as you go, the cursor shows your place, and a red squiggle marks a slip.', 'When you reach the end, a reply under the comment gives your speed and accuracy, and the Revision history table keeps a log.'],
-    script: ['The script note on the right is your task: retype the grey speech exactly.', 'Just start typing. Words turn black as you go, the cursor shows your place, and red marks a slip.', "When you finish, the note gives your speed and accuracy, and the stage manager's log keeps a record."],
-    sheet: ['The comment on the notes cell is your task: retype the grey notes exactly.', 'Just start typing. Text turns black as you go, and red marks a slip. The formula bar mirrors your typing.', 'When you finish, the comment gives your speed and accuracy, and the table below keeps a log.']
+    doc: ['The comment beside the paragraph is your task. The small line just above the text holds the test settings: time, words or quote mode, the length (or a custom one), punctuation, numbers, and where the words come from. Click any setting; the same options are in the Tools menu.', 'Just start typing; the clock waits for your first keystroke. Space jumps to the next word, Backspace fixes the current word, and Tab restarts with new text.', 'When the test ends, a reply under the comment gives your speed, accuracy and character counts, and the Revision history table keeps a log.'],
+    script: ['The script note is your task. The small line above the dialogue holds the test settings: time, words or quote mode, the length (or a custom one), punctuation, numbers, and where the words come from. The same options are in the View menu.', 'Just start typing; the clock waits for your first keystroke. Space jumps to the next word, Backspace fixes the current word, and Tab restarts with new text.', "When the test ends, the note gives your speed, accuracy and character counts, and the stage manager's log keeps a record."],
+    sheet: ['The comment on the notes cell is your task. The row just above the text holds the test settings: time, words or quote mode, the length (or a custom one), punctuation, numbers, and where the words come from. The same options are in the Tools menu.', 'Just start typing; the clock waits for your first keystroke. Space jumps to the next word, Backspace fixes the current word, and Tab restarts with new text. The formula bar shows the word you are on.', 'When the test ends, the comment gives your speed, accuracy and character counts, and the table below keeps a log.']
   },
-  summary(s) { return s.hist.length ? `Pass ${s.round} · best ${s.best} wpm` : ''; }
+  summary(s) { return s.hist && s.hist.length ? `Test ${s.round} · best ${s.best} wpm` : ''; }
 };
 
 /* ---------- 2. Rare answers ---------- */
 const RARE_LIMIT = 25000, RARE_WARN = 5000;
+/* Phases: 'ready' (category hidden, clock stopped, waiting for Start or
+   Next category) and 'live' (category showing, 25-second clock running). */
 GAMES.rare = {
   id: 'rare', name: 'Krillion', inspo: 'Category trivia that rewards rare answers',
-  blurb: 'One answer per category, 25 seconds each, unlimited guesses. The fewer people who would think of it, the more it scores.',
-  menu: [{ id: 'skip', label: 'Skip this category' }, { id: 'next', label: 'New set of categories' }],
+  blurb: 'One answer per category, 25 seconds each, unlimited guesses. Rarer answers score more, each category hides exactly one One in a Krillion, and you start each category when you are ready.',
+  menu: [{ id: 'go', label: 'Start next category' }, { id: 'skip', label: 'Skip this category' }, { id: 'next', label: 'New set of categories' }],
   init() { const s = { round: 1, score: 0, best: 0 }; this.newSet(s); return s; },
   newSet(s) {
     s.cats = []; for (let i = 0; i < 5; i++) s.cats.push(bagNext(s, 'bag', RARE_P.length));
-    Object.assign(s, { i: 0, input: '', log: [], misses: [], roundPts: 0, done: false, ms: 0, qms: 0, warned: false, lastNote: null });
+    Object.assign(s, { i: 0, input: '', log: [], misses: [], roundPts: 0, done: false, ms: 0, qms: 0, warned: false, lastNote: null, phase: 'ready' });
   },
-  running(s) { return !s.done; },
+  /* saves from before the ready step resume with the category hidden */
+  fix(s) { if (s.phase !== 'ready' && s.phase !== 'live') { s.phase = 'ready'; s.qms = 0; s.warned = false; } },
+  live(s) { return !s.done && s.phase === 'live'; },
+  begin(s) { Object.assign(s, { phase: 'live', qms: 0, warned: false, misses: [], input: '' }); },
+  running(s) { this.fix(s); return this.live(s); },
   left(s) { return Math.max(0, RARE_LIMIT - (s.qms || 0)); },
   clockMs(s) { return s.done ? 0 : this.left(s); },
   tick(s, dt) {
-    if (s.done) return false;
+    this.fix(s);
+    if (!this.live(s)) return false;
     s.qms = (s.qms || 0) + dt;
     if (s.qms >= RARE_LIMIT) { this.timeout(s); return true; }
     if (!s.warned && RARE_LIMIT - s.qms <= RARE_WARN) { s.warned = true; flash(s, '5 seconds left', 'info', RARE_WARN); return true; }
@@ -1654,16 +1862,28 @@ GAMES.rare = {
     const cat = RARE_P[s.cats[s.i]];
     s.log.push({ a: null, tier: 0, pts: 0, why: 'time' });
     s.lastNote = { text: `Time's up on “${cat.s}”. Accepted answers included ${this.examples(cat)}.`, tone: 'bad' };
-    flash(s, "Time's up. Next category.", 'bad');
+    flash(s, "Time's up", 'bad');
     this.advance(s);
   },
   key(s, k) {
-    if (k.key === 'Enter') { if (s.done) { s.round++; this.newSet(s); return true; } return this.submit(s); }
-    if (s.done) return false;
+    this.fix(s);
+    if (k.key === 'Enter') {
+      if (k.repeat) return true;
+      if (s.done) { s.round++; this.newSet(s); return true; }
+      if (s.phase === 'ready') { this.begin(s); return true; }
+      return this.submit(s);
+    }
+    if (!this.live(s)) return false;
     const v = editText(s.input, k, 60); if (v === null) return false; s.input = v; return true;
   },
   act(s, a) {
-    if (a === 'skip' && !s.done) {
+    this.fix(s);
+    if (a === 'go') {
+      if (s.done) { s.round++; this.newSet(s); return true; }
+      if (s.phase === 'ready') { this.begin(s); return true; }
+      return false;
+    }
+    if (a === 'skip' && this.live(s)) {
       const cat = RARE_P[s.cats[s.i]];
       s.log.push({ a: null, tier: 0, pts: 0, why: 'skip' });
       s.lastNote = { text: `Skipped “${cat.s}”. Accepted answers included ${this.examples(cat)}.`, tone: 'bad' };
@@ -1673,9 +1893,10 @@ GAMES.rare = {
     if (a === 'next') { s.round++; this.newSet(s); return true; }
     return false;
   },
+  /* never gives away the category's One in a Krillion answer */
   examples(cat) {
     const pick = t => { const o = cat.ans.filter(a => a.tier === t); return o.length ? o[Math.floor(Math.random() * o.length)].name : null; };
-    return [pick(1) || pick(2), pick(3) || pick(4), pick(5)].filter(Boolean).join(', ');
+    return [pick(1) || pick(2), pick(3), pick(4)].filter(Boolean).join(', ');
   },
   submit(s) {
     const raw = s.input.trim(); if (!raw) return true;
@@ -1685,10 +1906,15 @@ GAMES.rare = {
       const hit = m.a, T = TIERS[hit.tier];
       s.log.push({ a: hit.name, tier: hit.tier, pts: T.pts });
       s.roundPts += T.pts; s.score += T.pts;
-      const rarer = shuffle(cat.ans.filter(a => a.tier === 5 && a !== hit)).slice(0, 2).map(a => a.name);
       const fixed = m.exact ? '' : ` (autocorrected from “${raw}”)`;
-      s.lastNote = { text: `${hit.name}${fixed}: ${T.label}, +${T.pts}.` + (hit.tier < 5 && rarer.length ? ` Rarer picks: ${rarer.join(', ')}.` : ' One of the rarest on the key.'), tone: 'ok' };
-      flash(s, `${hit.name}: ${T.label}, +${T.pts}`, 'ok');
+      let more;
+      if (hit.tier === 5) more = ` That is this category's one and only One in a Krillion answer!`;
+      else {
+        const deeper = shuffle(cat.ans.filter(a => a.tier === 4 && a !== hit)).slice(0, 2).map(a => a.name);
+        more = hit.tier < 4 && deeper.length ? ` Rarer picks: ${deeper.join(', ')}.` : ' Only the One in a Krillion answer scores higher.';
+      }
+      s.lastNote = { text: `${hit.name}${fixed}: ${T.label}, +${T.pts}.${more}`, tone: 'ok' };
+      flash(s, hit.tier === 5 ? `${hit.name}: One in a Krillion! +${T.pts}` : `${hit.name}: ${T.label}, +${T.pts}`, 'ok');
       this.advance(s);
     } else {
       s.misses.push(raw);
@@ -1697,89 +1923,106 @@ GAMES.rare = {
     return true;
   },
   advance(s) {
-    s.i++; s.misses = []; s.qms = 0; s.warned = false;
+    Object.assign(s, { i: s.i + 1, misses: [], qms: 0, warned: false, input: '', phase: 'ready' });
     if (s.i >= s.cats.length) {
       s.done = true; s.best = Math.max(s.best, s.roundPts);
       s.lastNote = { text: (s.lastNote ? s.lastNote.text + ' ' : '') + `Set ${s.round} total: ${s.roundPts} points.`, tone: s.lastNote ? s.lastNote.tone : 'ok' };
     }
   },
   replies(s) {
-    const r = s.lastNote ? [s.lastNote] : [], m = s.misses || [];
+    if (!this.live(s)) return s.lastNote ? [s.lastNote] : [];
+    const r = [], m = s.misses || [];
     if (m.length > 3) r.push({ text: `${m.length - 3} earlier ${plural(m.length - 3, 'guess', 'guesses')} didn't match.`, tone: 'bad' });
     return r.concat(m.slice(-3).map(x => ({ text: `“${x}” isn't on the key. Keep guessing.`, tone: 'bad' })));
   },
   status(s) {
-    const left = s.done ? 0 : Math.ceil(this.left(s) / 1000) * 1000;
-    return [{ k: 'score', v: s.score + ' pts' }, { k: 'left', v: s.done ? 'Set done' : `Category ${s.i + 1} of 5` },
-      { k: 'round', v: 'Set ' + s.round }, { k: 'time', v: clock(left), ms: left, warn: !s.done && left <= RARE_WARN, force: true }];
+    this.fix(s);
+    const live = this.live(s), left = s.done ? 0 : Math.ceil(this.left(s) / 1000) * 1000;
+    const where = s.done ? 'Set done' : live ? `Category ${s.i + 1} of 5` : s.i ? `Up next: ${s.i + 1} of 5` : 'Ready to start';
+    return [{ k: 'score', v: s.score + ' pts' }, { k: 'left', v: where },
+      { k: 'round', v: 'Set ' + s.round }, { k: 'time', v: clock(left), ms: left, warn: live && left <= RARE_WARN, force: true }];
   },
   missText(L) { return L.why === 'time' ? 'time ran out' : L.why === 'skip' ? 'skipped' : 'no match'; },
   rows(s, m) {
+    const live = this.live(s);
     return s.cats.map((ci, idx) => {
       const c = RARE_P[ci], L = s.log[idx];
       if (L) return [String(idx + 1), c.s, L.a ? L.a : { v: this.missText(L), c: 'dim i' }, L.a ? TIERS[L.tier].label : '—', L.a ? '+' + L.pts : '0'];
-      if (idx === s.i && !s.done) return [String(idx + 1), { v: c.s, wt: m === 'sheet' ? 'prompt' : null }, m === 'sheet' ? { entry: true, v: s.input, ph: 'Type, then Enter', wt: 'input' } : { v: 'in progress', c: 'dim i' }, '', ''];
+      if (idx === s.i && live) return [String(idx + 1), { v: c.s, wt: m === 'sheet' ? 'prompt' : null }, m === 'sheet' ? { entry: true, v: s.input, ph: 'Type, then Enter', wt: 'input' } : { v: 'in progress', c: 'dim i' }, '', ''];
+      if (idx === s.i && !s.done) return [String(idx + 1), { v: '—', c: 'dim' }, { v: 'up next', c: 'dim i' }, '', ''];
       return [String(idx + 1), { v: '—', c: 'dim' }, '', '', ''];
     });
   },
   view(s, m) {
-    const cat = s.done ? null : RARE_P[s.cats[s.i]], replies = this.replies(s);
-    const sub = s.done ? 'Set complete' : `Category ${s.i + 1} of 5`;
-    const foot = s.done ? '' : '25 seconds per category · unlimited guesses';
-    const actions = s.done ? [] : [{ label: 'Skip', act: 'skip' }];
+    this.fix(s);
+    const live = this.live(s), ready = !s.done && !live, first = s.i === 0;
+    const cat = live ? RARE_P[s.cats[s.i]] : null, replies = this.replies(s);
+    const goLabel = s.done ? 'New set' : first ? 'Start' : 'Next category';
+    const sub = s.done ? 'Set complete' : live ? `Category ${s.i + 1} of 5` : `Category ${s.i + 1} of 5 · ready`;
+    const foot = live ? '25 seconds per category · unlimited guesses' : s.done ? 'Press Enter for a new set' : 'Clock stopped · press Enter when ready';
+    const actions = live ? [{ label: 'Skip', act: 'skip' }] : [{ label: goLabel, act: 'go' }];
+    const readyText = first
+      ? `Set ${s.round} is ready: five categories, 25 seconds each. Every category has exactly one One in a Krillion answer. The clock only runs while a category is showing.`
+      : `Clock stopped. Take a break if you like, then start category ${s.i + 1} of 5.`;
     if (m === 'script') {
       const blocks = [
         { t: 'h', text: 'INT. CAMPUS LIBRARY - STUDY ROOM - NIGHT' },
         { t: 'p', text: 'Index cards are fanned across the table. PROFESSOR IDA VANCE (60s) turns them over one at a time, an egg timer ticking beside her. MAYA (17) has to name something nobody else in the seminar would think of.' },
-        { t: 'say', who: 'VANCE', text: 'Twenty-five seconds a card. Common answers are worth almost nothing. Surprise me.' }
+        { t: 'say', who: 'VANCE', text: 'Twenty-five seconds a card. Common answers are worth almost nothing. One answer per card is worth everything. Surprise me.' }
       ];
       s.log.forEach((L, idx) => {
         blocks.push({ t: 'say', who: 'VANCE', text: RARE_P[s.cats[idx]].s + '.' });
         blocks.push({ t: 'say', who: 'MAYA', paren: L.a ? `${TIERS[L.tier].label}, +${L.pts}` : this.missText(L), text: L.a ? L.a + '.' : 'I have nothing. Next card.' });
       });
-      if (!s.done) {
+      if (live) {
         blocks.push({ t: 'say', id: 'q', who: 'VANCE', paren: `card ${s.i + 1} of 5`, text: cat.q, wt: 'prompt' });
         blocks.push({ t: 'entry', id: 'entry', who: 'MAYA', value: s.input, ph: 'type an answer, then press Enter', wt: 'input' });
+      } else if (ready) {
+        blocks.push({ t: 'p', text: first ? 'Vance taps the face-down deck and waits for Maya to settle in.' : 'Vance sets the card aside and lets Maya catch her breath. The egg timer sits still.', wt: 'prompt' });
+        blocks.push({ t: 'p', id: 'entry', runs: [{ text: 'Press Enter or ', c: 'b' }, { text: `turn over card ${s.i + 1} of 5`, c: 'b go', act: 'go' }, { text: '.', c: 'b' }], wt: 'input' });
       } else {
         blocks.push({ t: 'p', text: `Vance squares the deck and writes ${s.roundPts} on the whiteboard.` });
-        blocks.push({ t: 'p', id: 'entry', runs: [{ text: 'Press Enter to deal a new set of cards.', c: 'b' }], wt: 'input' });
+        blocks.push({ t: 'p', id: 'entry', runs: [{ text: 'Press Enter or ', c: 'b' }, { text: 'deal a new set of cards', c: 'b go', act: 'go' }, { text: '.', c: 'b' }], wt: 'input' });
       }
-      blocks.push({ t: 'note', anchor: s.done ? 'entry' : 'q', author: 'Script note', sub, text: s.done ? `Set ${s.round}: ${s.roundPts} points. Best set so far: ${s.best}.` : `Answer Vance's card in Maya's line. Rarity scores: ${TIER_KEY(', ')}.`, foot, replies, actions, wt: 'feedback' });
+      blocks.push({ t: 'note', anchor: live ? 'q' : 'entry', author: 'Script note', sub, text: s.done ? `Set ${s.round}: ${s.roundPts} points. Best set so far: ${s.best}.` : live ? `Answer Vance's card in Maya's line. Rarity scores: ${TIER_KEY(', ')}.` : readyText, foot, replies, actions: s.done ? [{ label: 'New set', act: 'go' }] : actions, wt: 'feedback' });
       return { title: 'Seminar - Draft 1', status: this.status(s), blocks };
     }
     if (m === 'sheet') {
       const rows = this.rows(s, m);
       const blocks = [
         { t: 'title', text: `Unit 4 research log - set ${s.round}` },
-        { t: 'meta', text: 'Rarity key: ' + TIER_KEY(' · ') },
+        { t: 'meta', text: 'Rarity key: ' + TIER_KEY(' · ') + ' (one per category)' },
         { t: 'table', id: 'find', cols: ['#', 'Category', 'Example', 'Rarity', 'Pts'], num: [0, 4], rows, wt: 'feedback' },
         { t: 'table', id: 'tot', rows: [['', { v: 'Set total', c: 'b' }, '', '', { v: String(s.roundPts), c: 'b' }], ['', 'All sets', '', '', String(s.score)]], num: [4] }
       ];
-      if (s.done) blocks.push({ t: 'table', id: 'entry', rows: [['', { v: 'Set complete. Press Enter for a new set.', c: 'b', wt: 'input' }]] });
-      blocks.push({ t: 'note', anchor: s.done ? 'entry' : 'find', cell: s.done ? [0, 1] : [s.i + 1, 1], author: 'Research lead', sub, text: s.done ? `That set scored ${s.roundPts} points.` : cat.q, foot, replies, actions, wt: 'prompt' });
-      return { title: 'Unit 4 Research Log', sheetName: 'Research log', sheetCols: [34, 220, 170, 130, 60], formula: s.done ? undefined : s.input, status: this.status(s), blocks };
+      if (s.done) blocks.push({ t: 'table', id: 'entry', rows: [['', { v: 'Set complete. Press Enter or click here for a new set.', c: 'b go', act: 'go', wt: 'input' }]] });
+      else if (ready) blocks.push({ t: 'table', id: 'entry', rows: [['', { v: first ? `Set ${s.round} ready. Press Enter or click here for category 1.` : `Clock stopped. Press Enter or click here for category ${s.i + 1}.`, c: 'b go', act: 'go', wt: 'input' }]] });
+      blocks.push({ t: 'note', anchor: live ? 'find' : 'entry', cell: live ? [s.i + 1, 1] : [0, 1], author: 'Research lead', sub, text: s.done ? `That set scored ${s.roundPts} points.` : live ? cat.q : readyText, foot, replies, actions: s.done ? [{ label: 'New set', act: 'go' }] : actions, wt: 'prompt' });
+      return { title: 'Unit 4 Research Log', sheetName: 'Research log', sheetCols: [34, 220, 170, 130, 60], formula: live ? s.input : undefined, status: this.status(s), blocks };
     }
     const blocks = [
       { t: 'meta', text: 'Shared with study group · Last edit a few minutes ago' },
       { t: 'title', text: 'Unit 4 Research Notes' },
       { t: 'h', text: 'Purpose' },
-      { t: 'p', text: 'For each research category we need one example, found within 25 seconds. Common examples are easy, so aim for ones fewer people would think of. Each example is checked against the class key and rated ' + TIER_KEY(', ', true) + '.' },
+      { t: 'p', text: 'For each research category we need one example, found within 25 seconds. Common examples are easy, so aim for ones fewer people would think of. Each example is checked against the class key and rated ' + TIER_KEY(', ', true) + '. Only one example per category earns One in a Krillion.' },
       { t: 'h', text: `Findings, set ${s.round}` },
       { t: 'table', id: 'find', cols: ['#', 'Category', 'Example', 'Rarity', 'Pts'], widths: [6, 34, 24, 25, 11], rows: this.rows(s, m), wt: 'feedback' },
       { t: 'h', text: 'Working notes' },
       s.done
-        ? { t: 'p', id: 'entry', runs: [{ text: `Set complete: ${s.roundPts} points (best set: ${s.best}). `, c: 'b' }, { text: 'Press Enter to start a new set.' }], wt: 'input' }
-        : { t: 'entry', id: 'entry', label: 'Example:', value: s.input, ph: 'type an example, then press Enter', wt: 'input' },
-      { t: 'note', anchor: 'entry', author: 'Research lead', sub, text: s.done ? `That set scored ${s.roundPts} points.` : cat.q, foot, replies, actions, wt: 'prompt' },
+        ? { t: 'p', id: 'entry', runs: [{ text: `Set complete: ${s.roundPts} points (best set: ${s.best}). `, c: 'b' }, { text: 'Press Enter or click ' }, { text: 'New set', c: 'go', act: 'go' }, { text: ' to start another.' }], wt: 'input' }
+        : ready
+          ? { t: 'p', id: 'entry', runs: [{ text: first ? `Set ${s.round} is ready. ` : `Category ${s.i} logged. `, c: 'b' }, { text: 'Press Enter or click ' }, { text: goLabel, c: 'go', act: 'go' }, { text: first ? ' to reveal the first category.' : ` to reveal category ${s.i + 1} of 5.` }], wt: 'input' }
+          : { t: 'entry', id: 'entry', label: 'Example:', value: s.input, ph: 'type an example, then press Enter', wt: 'input' },
+      { t: 'note', anchor: 'entry', author: 'Research lead', sub, text: s.done ? `That set scored ${s.roundPts} points.` : live ? cat.q : readyText, foot, replies, actions: s.done ? [{ label: 'New set', act: 'go' }] : actions, wt: 'prompt' },
       { t: 'h', text: 'Sources' },
       { t: 'list', items: ['Class answer key, Unit 4 (rarity ratings)', 'Textbook glossary, chapters 6-9', 'Library database: general reference'] }
     ];
     return { title: 'Unit 4 Research Notes', font: 'sans', size: 11, status: this.status(s), blocks };
   },
   walk: {
-    doc: ['The comment beside “Working notes” names the current category. Each category gets 25 seconds, and a set has five.', 'Type an example on the “Example:” line and press Enter. Guess as often as you like before time runs out; typos and close spellings are autocorrected.', 'Replies under the comment give the match, its rarity and points, and the Findings table logs every answer. In the last 5 seconds the timer turns red and a small notice appears at the bottom.'],
-    script: ["Vance's line names the category on the current card. Each card gets 25 seconds, and a set has five.", "Type Maya's answer on her dialogue line and press Enter. Guess as often as you like before time runs out; typos are autocorrected.", 'The script note reports the match, rarity and points. In the last 5 seconds the timer turns red and a small notice appears.'],
-    sheet: ['The comment on the highlighted category cell is the current prompt. Each category gets 25 seconds, and a set has five.', 'Type in the active cell next to it and press Enter. Guess as often as you like before time runs out; typos are autocorrected.', 'Replies under the comment report the result, and each row fills in with rarity and points. In the last 5 seconds the timer turns red and a small notice appears.']
+    doc: ['The comment beside “Working notes” shows the current category once you start it. Each category gets 25 seconds, and a set has five. The clock only runs while a category is showing.', 'Press Enter (or Start / Next category in the comment) to reveal a category, then type an example on the “Example:” line and press Enter. Guess as often as you like; typos and close spellings are autocorrected.', 'Replies under the comment give the rarity and points, and the Findings table logs every answer. After each answer the clock stops until you start the next category, so take a break whenever you like.'],
+    script: ["Vance's line names the category on the current card once you turn it over. Each card gets 25 seconds, and a set has five.", "Press Enter to turn over a card, then type Maya's answer on her dialogue line and press Enter. Guess as often as you like; typos are autocorrected.", 'The script note reports the rarity and points. After each card the clock stops until you turn over the next one.'],
+    sheet: ['The comment shows the current category once you start it. Each category gets 25 seconds, and a set has five.', 'Press Enter (or Start / Next category in the comment) to reveal a category, then type in the active cell and press Enter. Guess as often as you like; typos are autocorrected.', 'Replies under the comment report the result, and each row fills in with rarity and points. After each answer the clock stops until you start the next category.']
   },
   summary(s) { return s.score ? `Set ${s.round} · ${s.score} pts` : ''; }
 };
@@ -2814,7 +3057,7 @@ function mi(name, size) {
 
 const xcls = c => c ? String(c).split(' ').filter(Boolean).map(x => 'x-' + x).join(' ') : '';
 function runsHTML(runs) {
-  return (runs || []).map(r => r.caret ? '<span class="caret"></span>' : (r.c ? `<span class="${xcls(r.c)}">${esc(r.text)}</span>` : esc(r.text))).join('');
+  return (runs || []).map(r => r.caret ? '<span class="caret"></span>' : (r.c || r.act ? `<span class="${xcls(r.c)}"${actAttr(r.act)}>${esc(r.text)}</span>` : esc(r.text))).join('');
 }
 const inner = b => b.runs ? runsHTML(b.runs) : esc(b.text || '');
 const cellObj = c => (c == null || typeof c !== 'object') ? { v: c == null ? '' : String(c) } : c;
@@ -3409,9 +3652,9 @@ const SKINS = {
 };
 const SKIN_ORDER = ['docs', 'script', 'sheets'];
 const SKIN_INFO = {
-  docs: { status: 'Score, tries left and the timer sit in the small counter at the bottom left, where a word count would normally be.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the Tools menu.' },
-  script: { status: 'Your score is in the pill at the bottom left. Round, tries left and the Writing clock (your timer) follow along the bottom bar.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the View menu.' },
-  sheets: { status: 'Score, tries left and the timer are in the box at the bottom right, where a spreadsheet shows its sum.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the Tools menu.' }
+  docs: { status: 'Score, tries left and the timer sit in the small counter at the bottom left, where a word count would normally be.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the Tools menu, in slightly heavier text than the ordinary menu items.' },
+  script: { status: 'Your score is in the pill at the bottom left. Round, tries left and the Writing clock (your timer) follow along the bottom bar.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the View menu, in bolder text than the ordinary menu items.' },
+  sheets: { status: 'Score, tries left and the timer are in the box at the bottom right, where a spreadsheet shows its sum.', menu: 'Game controls (new round, skip, restart, switch game or workspace) are at the top of the Tools menu, in slightly heavier text than the ordinary menu items.' }
 };
 
 /* ============================================================
@@ -3524,6 +3767,7 @@ function maybeWalk() { const combo = A.game + '|' + A.skinKind; if (!S.prefs.see
 function doAct(a) {
   if (A.hidden || A.screen !== 'ws') return;
   const G = GAMES[A.game];
+  if (a.startsWith('custom:') && G.custom) { const spec = G.custom(A.state, a.slice(7)); if (spec) askNumber(spec); return; }
   if (G.act && G.act(A.state, a, medium())) afterChange(true);
 }
 function toggleHidden() {
@@ -3545,11 +3789,14 @@ function goSetup() {
 }
 
 /* ---------- menus ---------- */
+const markReal = items => items.map(it => it.sep ? it : Object.assign(it, { real: true }, it.sub ? { sub: markReal(it.sub) } : {}));
 function gameMenuItems() {
-  if (A.hidden) return [{ label: 'Resume', sc: keyLabel(), act: toggleHidden }, { sep: true }];
+  if (A.hidden) return markReal([{ label: 'Resume', sc: keyLabel(), act: toggleHidden }, { sep: true }]);
   const G = GAMES[A.game];
-  return [
-    ...G.menu.map(m => ({ label: m.label, act: () => doAct(m.id) })),
+  return markReal([
+    ...(typeof G.menu === 'function' ? G.menu(A.state, medium()) : G.menu).map(function mk(m) {
+      return m.sub ? { label: m.label, sub: m.sub.map(mk) } : { label: m.label, sc: m.sc, checked: m.checked, act: () => doAct(m.id) };
+    }),
     { label: 'Restart this game…', act: confirmRestart },
     { sep: true },
     { label: 'Game', sub: GAME_ORDER.map(id => ({ label: GAMES[id].name, checked: id === A.game, act: () => switchGame(id) })) },
@@ -3560,7 +3807,7 @@ function gameMenuItems() {
     { label: 'Preferences…', act: openPrefs },
     { label: 'Start screen', act: goSetup },
     { sep: true }
-  ];
+  ]);
 }
 function openGameMenu(name, btn) {
   const skin = A.skin; if (!skin) return;
@@ -3579,7 +3826,7 @@ const DD = {
     const el = document.createElement('div');
     el.className = 'bw-dd dd-' + this.kind; el.setAttribute('role', 'menu');
     el.innerHTML = items.map((it, i) => it.sep ? '<div class="dd-sep"></div>' :
-      `<button class="dd-i${it.sub ? ' has-sub' : ''}" role="menuitem" data-i="${i}"><span class="dd-ck">${it.checked ? ico('check', 16, 2) : ''}</span><span class="dd-l">${esc(it.label)}</span><span class="dd-sc">${it.sub ? '▸' : esc(it.sc || '')}</span></button>`).join('');
+      `<button class="dd-i${it.sub ? ' has-sub' : ''}${it.real ? ' real' : ''}" role="menuitem" data-i="${i}"><span class="dd-ck">${it.checked ? ico('check', 16, 2) : ''}</span><span class="dd-l">${esc(it.label)}</span><span class="dd-sc">${it.sub ? '▸' : esc(it.sc || '')}</span></button>`).join('');
     document.body.appendChild(el);
     const r = el.getBoundingClientRect();
     el.style.left = Math.max(4, Math.min(x, innerWidth - r.width - 4)) + 'px';
@@ -3649,6 +3896,22 @@ function confirmRestart() {
     { label: 'Cancel' },
     { label: 'Restart', primary: true, act: () => { A.state = S.games[A.game] = G.init(medium()); A.lastFlash = 0; closeDialog(); afterChange(false); } }
   ]);
+}
+function askNumber(spec) {
+  const apply = () => {
+    const inp = $('#pf-num'), v = Number(inp && inp.value);
+    if (!Number.isInteger(v) || v < spec.min || v > spec.max) { const h = $('#pf-numhint'); if (h) h.hidden = false; return; }
+    closeDialog(); doAct(spec.act + v);
+  };
+  openDialog(spec.title, `
+    <div class="pf-row"><div><div class="pf-l">${esc(spec.label)}</div><div class="pf-d">A whole number from ${spec.min} to ${spec.max}.</div></div><input id="pf-num" type="number" inputmode="numeric" min="${spec.min}" max="${spec.max}" step="1" value="${esc(spec.value)}"></div>
+    <div class="pf-hint" id="pf-numhint" hidden>Enter a whole number from ${spec.min} to ${spec.max}.</div>`,
+    [{ label: 'Cancel' }, { label: 'Apply', primary: true, act: apply }],
+    m => {
+      const inp = $('#pf-num', m);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); apply(); } });
+      setTimeout(() => { inp.focus(); inp.select(); });
+    });
 }
 function openPrefs() {
   const p = S.prefs;
